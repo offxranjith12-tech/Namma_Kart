@@ -32,9 +32,9 @@ export const Home = () => {
 
   return (
     <div>
-      {/* Category Subnav Bar */}
+      {/* Category Subnav Bar (Side-Scrollable Track) */}
       <div className="category-subnav">
-        <div className="container category-subnav-list">
+        <div className="category-subnav-list">
           <Link to="/products" className="cat-chip active">All Products</Link>
           {categories.map((cat) => (
             <Link key={cat.id} to={`/products?category=${cat.id}`} className="cat-chip">

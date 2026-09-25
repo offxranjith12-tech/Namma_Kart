@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { Search, Filter, SlidersHorizontal } from 'lucide-react';
+import { Search, Filter, SlidersHorizontal, CheckCircle2 } from 'lucide-react';
 import { productsAPI, categoriesAPI } from '../services/api';
 import { ProductCard } from '../components/ProductCard';
 
@@ -67,117 +67,142 @@ export const Products = () => {
   }
 
   return (
-    <div className="container" style={{ padding: '2rem 1rem 4rem' }}>
-      {/* Search Header Banner if searching */}
-      {searchQuery && (
-        <div style={{ marginBottom: '1.5rem', padding: '1rem', backgroundColor: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
-          <p style={{ fontSize: '1rem' }}>
-            Showing results for <strong>"{searchQuery}"</strong> ({filtered.length} products found)
-          </p>
+    <div>
+      {/* 1. Horizontal Side-Scrollable Category Suggestions Bar (Full swipe on all devices) */}
+      <div className="category-subnav">
+        <div className="category-subnav-list">
+          <button
+            type="button"
+            className={`cat-chip ${!selectedCategory ? 'active' : ''}`}
+            onClick={() => handleCategoryChange('')}
+          >
+            All Products
+          </button>
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              className={`cat-chip ${String(selectedCategory) === String(cat.id) ? 'active' : ''}`}
+              onClick={() => handleCategoryChange(cat.id)}
+            >
+              {cat.name}
+            </button>
+          ))}
         </div>
-      )}
+      </div>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '240px 1fr', gap: '2rem' }}>
-        {/* Sidebar Filters */}
-        <aside>
-          <div className="card" style={{ padding: '1.25rem' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.75rem' }}>
-              <Filter size={18} color="var(--color-primary)" />
-              <h4 style={{ fontWeight: 800 }}>Categories</h4>
-            </div>
+      <div className="container" style={{ padding: '1.5rem 1rem 4rem' }}>
+        {/* Search Header Banner if searching */}
+        {searchQuery && (
+          <div style={{ marginBottom: '1.25rem', padding: '1rem', backgroundColor: 'var(--color-surface)', borderRadius: 'var(--radius-md)', border: '1px solid var(--color-border)' }}>
+            <p style={{ fontSize: '0.95rem' }}>
+              Showing results for <strong>"{searchQuery}"</strong> ({filtered.length} products found)
+            </p>
+          </div>
+        )}
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-              <button
-                type="button"
-                className={`btn btn-sm ${!selectedCategory ? 'btn-primary' : 'btn-soft'}`}
-                style={{ justifyContent: 'flex-start', width: '100%' }}
-                onClick={() => handleCategoryChange('')}
-              >
-                All Categories
-              </button>
+        <div className="products-layout">
+          {/* Desktop Sidebar Filters */}
+          <aside className="products-sidebar-desktop">
+            <div className="card" style={{ padding: '1.25rem' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem', borderBottom: '1px solid var(--color-border)', paddingBottom: '0.75rem' }}>
+                <Filter size={18} color="var(--color-primary)" />
+                <h4 style={{ fontWeight: 800 }}>Categories</h4>
+              </div>
 
-              {categories.map((cat) => (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
                 <button
-                  key={cat.id}
                   type="button"
-                  className={`btn btn-sm ${String(selectedCategory) === String(cat.id) ? 'btn-primary' : 'btn-soft'}`}
+                  className={`btn btn-sm ${!selectedCategory ? 'btn-primary' : 'btn-soft'}`}
                   style={{ justifyContent: 'flex-start', width: '100%' }}
-                  onClick={() => handleCategoryChange(cat.id)}
+                  onClick={() => handleCategoryChange('')}
                 >
-                  {cat.name}
+                  All Categories
                 </button>
-              ))}
+
+                {categories.map((cat) => (
+                  <button
+                    key={cat.id}
+                    type="button"
+                    className={`btn btn-sm ${String(selectedCategory) === String(cat.id) ? 'btn-primary' : 'btn-soft'}`}
+                    style={{ justifyContent: 'flex-start', width: '100%' }}
+                    onClick={() => handleCategoryChange(cat.id)}
+                  >
+                    {cat.name}
+                  </button>
+                ))}
+              </div>
+
+              <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700 }}>
+                  <input
+                    type="checkbox"
+                    checked={inStockOnly}
+                    onChange={(e) => setInStockOnly(e.target.checked)}
+                    style={{ accentColor: 'var(--color-primary)' }}
+                  />
+                  In Stock Only
+                </label>
+              </div>
+            </div>
+          </aside>
+
+          {/* Products View */}
+          <main>
+            {/* Controls Bar */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem', flexWrap: 'wrap', gap: '0.75rem' }}>
+              <span style={{ fontSize: '0.92rem', color: 'var(--color-text-muted)', fontWeight: 700 }}>
+                Showing {filtered.length} products
+              </span>
+
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                <SlidersHorizontal size={16} color="var(--color-primary)" />
+                <span style={{ fontSize: '0.85rem', fontWeight: 700 }}>Sort:</span>
+                <select
+                  className="form-control"
+                  style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="popular">Popularity</option>
+                  <option value="price-low">Price: Low to High</option>
+                  <option value="price-high">Price: High to Low</option>
+                  <option value="discount">Highest Discount</option>
+                </select>
+              </div>
             </div>
 
-            <div style={{ marginTop: '1.5rem', paddingTop: '1rem', borderTop: '1px solid var(--color-border)' }}>
-              <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', fontWeight: 700 }}>
-                <input
-                  type="checkbox"
-                  checked={inStockOnly}
-                  onChange={(e) => setInStockOnly(e.target.checked)}
-                  style={{ accentColor: 'var(--color-primary)' }}
-                />
-                In Stock Only
-              </label>
-            </div>
-          </div>
-        </aside>
-
-        {/* Products View */}
-        <main>
-          {/* Controls Bar */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
-            <span style={{ fontSize: '0.95rem', color: 'var(--color-text-muted)', fontWeight: 600 }}>
-              Showing {filtered.length} products
-            </span>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-              <SlidersHorizontal size={16} color="var(--color-primary)" />
-              <span style={{ fontSize: '0.88rem', fontWeight: 700 }}>Sort by:</span>
-              <select
-                className="form-control"
-                style={{ width: 'auto', padding: '0.4rem 0.8rem', fontSize: '0.88rem' }}
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-              >
-                <option value="popular">Popularity</option>
-                <option value="price-low">Price: Low to High</option>
-                <option value="price-high">Price: High to Low</option>
-                <option value="discount">Highest Discount</option>
-              </select>
-            </div>
-          </div>
-
-          {/* Product Grid */}
-          {loading ? (
-            <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
-              Loading fresh products...
-            </div>
-          ) : filtered.length === 0 ? (
-            <div className="card-soft" style={{ padding: '3rem', textAlign: 'center' }}>
-              <h3 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>No products found</h3>
-              <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.25rem' }}>
-                We couldn't find any products matching your search or filter.
-              </p>
-              <button
-                type="button"
-                className="btn btn-primary btn-sm"
-                onClick={() => {
-                  setSearchParams({});
-                  setInStockOnly(false);
-                }}
-              >
-                Reset Filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-3">
-              {filtered.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
-          )}
-        </main>
+            {/* Product Grid */}
+            {loading ? (
+              <div style={{ padding: '3rem', textAlign: 'center', color: 'var(--color-text-muted)' }}>
+                Loading fresh products...
+              </div>
+            ) : filtered.length === 0 ? (
+              <div className="card-soft" style={{ padding: '3rem', textAlign: 'center' }}>
+                <h3 style={{ fontWeight: 800, marginBottom: '0.5rem' }}>No products found</h3>
+                <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.25rem' }}>
+                  We couldn't find any products matching your search or filter.
+                </p>
+                <button
+                  type="button"
+                  className="btn btn-primary btn-glue btn-sm"
+                  onClick={() => {
+                    setSearchParams({});
+                    setInStockOnly(false);
+                  }}
+                >
+                  Reset Filters
+                </button>
+              </div>
+            ) : (
+              <div className="grid grid-cols-3">
+                {filtered.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </main>
+        </div>
       </div>
     </div>
   );
