@@ -78,6 +78,8 @@ public class ProductService {
                 .discount(dto.getDiscount() != null ? dto.getDiscount() : BigDecimal.ZERO)
                 .rating(dto.getRating() != null ? dto.getRating() : BigDecimal.valueOf(4.5))
                 .active(dto.getActive() != null ? dto.getActive() : true)
+                .minQuantity(dto.getMinQuantity() != null ? dto.getMinQuantity() : 1)
+                .maxQuantity(dto.getMaxQuantity() != null ? dto.getMaxQuantity() : 50)
                 .build();
 
         return mapToDTO(productRepository.save(product));
@@ -103,6 +105,8 @@ public class ProductService {
         if (dto.getDiscount() != null) product.setDiscount(dto.getDiscount());
         if (dto.getRating() != null) product.setRating(dto.getRating());
         if (dto.getActive() != null) product.setActive(dto.getActive());
+        if (dto.getMinQuantity() != null) product.setMinQuantity(dto.getMinQuantity());
+        if (dto.getMaxQuantity() != null) product.setMaxQuantity(dto.getMaxQuantity());
 
         return mapToDTO(productRepository.save(product));
     }
@@ -139,6 +143,8 @@ public class ProductService {
                 .discountedPrice(discountedPrice)
                 .rating(product.getRating())
                 .active(product.getActive())
+                .minQuantity(product.getMinQuantity())
+                .maxQuantity(product.getMaxQuantity())
                 .createdAt(product.getCreatedAt())
                 .build();
     }

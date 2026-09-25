@@ -22,6 +22,8 @@ public class AdminDashboardDTO {
     private Long cancelledOrders;
     private BigDecimal totalRevenue;
     private BigDecimal todayRevenue;
+    private BigDecimal thisWeekRevenue;
+    private BigDecimal thisMonthRevenue;
     private Long lowStockCount;
     private Long totalDeliveryPersons;
     private Long activeDeliveryPersons;

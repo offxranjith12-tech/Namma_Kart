@@ -50,6 +50,14 @@ public class AdminService {
         BigDecimal todayRevenue = orderRepository.sumTodayRevenue(startOfToday);
         if (todayRevenue == null) todayRevenue = BigDecimal.ZERO;
 
+        LocalDateTime startOfWeek = LocalDate.now().with(java.time.temporal.TemporalAdjusters.previousOrSame(java.time.DayOfWeek.MONDAY)).atStartOfDay();
+        BigDecimal thisWeekRevenue = orderRepository.sumTodayRevenue(startOfWeek);
+        if (thisWeekRevenue == null) thisWeekRevenue = BigDecimal.ZERO;
+
+        LocalDateTime startOfMonth = LocalDate.now().withDayOfMonth(1).atStartOfDay();
+        BigDecimal thisMonthRevenue = orderRepository.sumTodayRevenue(startOfMonth);
+        if (thisMonthRevenue == null) thisMonthRevenue = BigDecimal.ZERO;
+
         List<ProductDTO> lowStockProducts = productService.getLowStockProducts(10);
         long lowStockCount = lowStockProducts.size();
 
@@ -74,6 +82,8 @@ public class AdminService {
                 .cancelledOrders(cancelledOrders)
                 .totalRevenue(totalRevenue)
                 .todayRevenue(todayRevenue)
+                .thisWeekRevenue(thisWeekRevenue)
+                .thisMonthRevenue(thisMonthRevenue)
                 .lowStockCount(lowStockCount)
                 .totalDeliveryPersons(totalDeliveryPersons)
                 .activeDeliveryPersons(activeDeliveryPersons)

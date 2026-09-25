@@ -6,36 +6,37 @@
    ========================================================================== */
 
 :root {
-  /* Core Colours (Strict Two-Colour System) */
-  --color-primary: oklch(0.47 0.13 151);
-  --color-primary-dark: oklch(0.38 0.12 151);
-  --color-primary-light: oklch(0.55 0.14 151);
-  --color-primary-10: oklch(0.47 0.13 151 / 0.10);
-  --color-primary-15: oklch(0.47 0.13 151 / 0.15);
-  --color-primary-20: oklch(0.47 0.13 151 / 0.20);
-  --color-primary-30: oklch(0.47 0.13 151 / 0.30);
-  --color-primary-glow: oklch(0.47 0.13 151 / 0.40);
+  /* Core Colours (Strict HEX System) */
+  --color-primary: #198754;
+  --color-primary-dark: #173B2A;
+  --color-primary-hover: #146C43;
+  --color-primary-light: #A5D6B0;
+  --color-primary-10: #E8F5EA;
+  --color-primary-15: #E8F5EA;
+  --color-primary-20: #D1E7D7;
+  --color-primary-30: #A5D6B0;
+  --color-primary-glow: rgba(25, 135, 84, 0.4);
   
-  --color-bg: oklch(0.982 0.018 94);
-  --color-surface: oklch(0.95 0.025 94);
-  --color-surface-card: var(--color-surface);
-  --color-surface-hover: oklch(0.92 0.03 94);
+  --color-bg: #F4FAF6;
+  --color-surface: #FFFFFF;
+  --color-surface-card: #FFFFFF;
+  --color-surface-hover: #F8FDF9;
   
-  --color-text-main: oklch(0.25 0.04 151);
-  --color-text-muted: oklch(0.45 0.04 151);
-  --color-text-subtle: oklch(0.60 0.03 151);
-  --color-text-inverse: var(--color-bg);
+  --color-text-main: #173B2A;
+  --color-text-muted: #146C43;
+  --color-text-subtle: #A5D6B0;
+  --color-text-inverse: #FFFFFF;
 
-  --color-border: oklch(0.47 0.13 151 / 0.14);
-  --color-border-subtle: oklch(0.47 0.13 151 / 0.08);
-  --color-border-active: oklch(0.47 0.13 151 / 0.45);
+  --color-border: #D1E7D7;
+  --color-border-subtle: #E8F5EA;
+  --color-border-active: #198754;
 
   /* Functional Status Colors within Green Spectrum */
-  --status-placed: oklch(0.47 0.13 151 / 0.12);
-  --status-confirmed: oklch(0.47 0.13 151 / 0.18);
-  --status-preparing: oklch(0.47 0.13 151 / 0.24);
-  --status-out: oklch(0.47 0.13 151 / 0.30);
-  --status-delivered: oklch(0.47 0.13 151);
+  --status-placed: #E8F5EA;
+  --status-confirmed: #D1E7D7;
+  --status-preparing: #A5D6B0;
+  --status-out: #146C43;
+  --status-delivered: #198754;
 
   /* Typography */
   --font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
@@ -46,19 +47,20 @@
   --font-weight-heavy: 800;
 
   /* Shapes */
-  --radius-sm: 0.5rem;
-  --radius-md: 0.75rem;
-  --radius-lg: 1rem;
-  --radius-xl: 1.5rem;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-img: 14px;
   --radius-full: 9999px;
 
   /* Shadows & Glows */
-  --shadow-sm: 0 1px 3px oklch(0.47 0.13 151 / 0.05);
-  --shadow-md: 0 4px 12px oklch(0.47 0.13 151 / 0.08);
-  --shadow-lg: 0 10px 24px oklch(0.47 0.13 151 / 0.12);
-  --shadow-hover: 0 10px 25px oklch(0.47 0.13 151 / 0.16);
-  --glow-primary: 0 0 15px oklch(0.47 0.13 151 / 0.35);
-  --glow-strong: 0 0 25px oklch(0.47 0.13 151 / 0.55);
+  --shadow-sm: 0 1px 3px rgba(25, 135, 84, 0.04);
+  --shadow-md: 0 4px 12px rgba(25, 135, 84, 0.06);
+  --shadow-lg: 0 4px 20px rgba(25, 135, 84, 0.08);
+  --shadow-hover: 0 4px 20px rgba(25, 135, 84, 0.12);
+  --glow-primary: 0 0 15px rgba(25, 135, 84, 0.25);
+  --glow-strong: 0 0 25px rgba(25, 135, 84, 0.40);
 
   /* Transitions */
   --transition-fast: 240ms ease-out;
@@ -180,21 +182,21 @@ a:hover {
 
 /* Button Glue Animation (Elastic spring + sticky glow aura) */
 .btn-glue, .btn-glow {
-  box-shadow: 0 4px 14px oklch(0.47 0.13 151 / 0.32), 0 0 0 1px oklch(0.47 0.13 151 / 0.15);
+  box-shadow: 0 4px 14px rgba(25, 135, 84, 0.32), 0 0 0 1px rgba(25, 135, 84, 0.15);
   animation: buttonGluePulse 2.8s infinite ease-in-out;
 }
 
 .btn-glue:hover:not(:disabled), .btn-glow:hover:not(:disabled) {
-  box-shadow: 0 8px 24px oklch(0.47 0.13 151 / 0.55), 0 0 30px oklch(0.47 0.13 151 / 0.45);
+  box-shadow: 0 8px 24px rgba(25, 135, 84, 0.55), 0 0 30px rgba(25, 135, 84, 0.45);
   transform: translateY(-3px) scale(1.02);
 }
 
 @keyframes buttonGluePulse {
   0%, 100% {
-    box-shadow: 0 4px 14px oklch(0.47 0.13 151 / 0.30), 0 0 0 0 oklch(0.47 0.13 151 / 0.4);
+    box-shadow: 0 4px 14px rgba(25, 135, 84, 0.30), 0 0 0 0 rgba(25, 135, 84, 0.4);
   }
   50% {
-    box-shadow: 0 6px 22px oklch(0.47 0.13 151 / 0.50), 0 0 16px 3px oklch(0.47 0.13 151 / 0.35);
+    box-shadow: 0 6px 22px rgba(25, 135, 84, 0.50), 0 0 16px 3px rgba(25, 135, 84, 0.35);
   }
 }
 
@@ -203,13 +205,13 @@ a:hover {
   background-color: var(--color-primary);
   color: var(--color-text-inverse);
   border-color: var(--color-primary);
-  box-shadow: 0 4px 14px oklch(0.47 0.13 151 / 0.28);
+  box-shadow: 0 4px 14px rgba(25, 135, 84, 0.28);
 }
 
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
-  box-shadow: 0 8px 22px oklch(0.47 0.13 151 / 0.48), 0 0 18px oklch(0.47 0.13 151 / 0.3);
+  box-shadow: 0 8px 22px rgba(25, 135, 84, 0.48), 0 0 18px rgba(25, 135, 84, 0.3);
   transform: translateY(-2px) scale(1.015);
 }
 
@@ -283,7 +285,7 @@ a:hover {
 }
 
 .card-glow:hover {
-  box-shadow: 0 10px 30px oklch(0.47 0.13 151 / 0.22);
+  box-shadow: 0 10px 30px rgba(25, 135, 84, 0.22);
 }
 
 /* Form Controls */
@@ -359,10 +361,10 @@ a:hover {
 
 @keyframes badgeGlow {
   0%, 100% {
-    box-shadow: 0 0 0 0 oklch(0.47 0.13 151 / 0.4);
+    box-shadow: 0 0 0 0 rgba(25, 135, 84, 0.4);
   }
   50% {
-    box-shadow: 0 0 0 6px oklch(0.47 0.13 151 / 0);
+    box-shadow: 0 0 0 6px rgba(25, 135, 84, 0);
   }
 }
 
@@ -416,10 +418,10 @@ a:hover {
   bottom: 0;
   left: 0;
   right: 0;
-  background: oklch(0.95 0.025 94 / 0.94);
+  background: rgba(255, 255, 255, 0.94);
   backdrop-filter: blur(14px);
   border-top: 1.5px solid var(--color-border);
-  box-shadow: 0 -4px 18px oklch(0.47 0.13 151 / 0.12);
+  box-shadow: 0 -4px 18px rgba(25, 135, 84, 0.12);
   z-index: 999;
   padding: 0.4rem 0.5rem;
   justify-content: space-around;
@@ -548,13 +550,17 @@ a:hover {
 }
 .product-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 24px oklch(0.47 0.13 151 / 0.15);
+  box-shadow: 0 8px 24px rgba(25, 135, 84, 0.15);
 }
 .product-card-img {
   transition: transform 240ms ease-out;
 }
 .product-card:hover .product-card-img {
   transform: scale(1.03);
+}
+.product-image-wrap img {
+  border-radius: var(--radius-img);
+  overflow: hidden;
 }
 
 /* 3. Add to Cart Fly Animation Container */
@@ -583,8 +589,8 @@ a:hover {
 /* 5. Order Tracking Pulse */
 @keyframes statusPulse {
   0% { box-shadow: 0 0 0 0 var(--color-primary-30); }
-  70% { box-shadow: 0 0 0 8px oklch(0.47 0.13 151 / 0); }
-  100% { box-shadow: 0 0 0 0 oklch(0.47 0.13 151 / 0); }
+  70% { box-shadow: 0 0 0 8px rgba(25, 135, 84, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(25, 135, 84, 0); }
 }
 .status-pulse {
   animation: statusPulse 2s infinite ease-out;
@@ -595,6 +601,33 @@ a:hover {
 .delivery-card-active {
   transform: translateY(-2px);
   border-color: var(--color-primary) !important;
-  box-shadow: 0 4px 12px oklch(0.47 0.13 151 / 0.15);
+  box-shadow: 0 4px 12px rgba(25, 135, 84, 0.15);
+}
+
+
+/* Hero Carousel Mobile Fixes */
+.hero-carousel-slide {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-size: cover;
+  background-position: center right;
+  transition: opacity 1s ease-in-out;
+  z-index: 0;
+}
+
+.hero-carousel-overlay {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.7) 45%, transparent 100%);
+  z-index: 1;
+}
+
+@media (max-width: 768px) {
+  .hero-carousel-slide {
+    background-position: 70% center;
+  }
+  .hero-carousel-overlay {
+    background: linear-gradient(to right, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.85) 60%, rgba(255,255,255,0.4) 100%);
+  }
 }
 

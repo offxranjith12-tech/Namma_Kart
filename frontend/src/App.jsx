@@ -31,8 +31,6 @@ import { AdminDeliverySlots } from './pages/admin/AdminDeliverySlots';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminUsers } from './pages/admin/AdminUsers';
 import { AdminAnalytics } from './pages/admin/AdminAnalytics';
-import { AdminReviews } from './pages/admin/AdminReviews';
-
 // Delivery Pages
 import { DeliveryDashboard } from './pages/delivery/DeliveryDashboard';
 import { DeliveryOrders } from './pages/delivery/DeliveryOrders';
@@ -225,14 +223,6 @@ export const App = () => {
             element={
               <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
                 <AdminAnalytics />
-              </ProtectedRoute>
-            }
-          />
-          <Route
-            path="/admin/reviews"
-            element={
-              <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
-                <AdminReviews />
               </ProtectedRoute>
             }
           />

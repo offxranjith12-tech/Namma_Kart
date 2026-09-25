@@ -45,5 +45,7 @@ public class ProductDTO {
     private BigDecimal discountedPrice;
     private BigDecimal rating;
     private Boolean active;
+    private Integer minQuantity;
+    private Integer maxQuantity;
     private LocalDateTime createdAt;
 }

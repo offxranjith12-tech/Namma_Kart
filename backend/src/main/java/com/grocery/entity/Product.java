@@ -54,6 +54,14 @@ public class Product {
     @Column(nullable = false)
     private Boolean active = true;
 
+    @Builder.Default
+    @Column(name = "min_quantity", nullable = false)
+    private Integer minQuantity = 1;
+
+    @Builder.Default
+    @Column(name = "max_quantity", nullable = false)
+    private Integer maxQuantity = 50;
+
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;

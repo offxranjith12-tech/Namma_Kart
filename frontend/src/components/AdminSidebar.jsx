@@ -87,14 +87,6 @@ export const AdminSidebar = () => {
       </NavLink>
 
       <NavLink
-        to="/admin/reviews"
-        className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
-      >
-        <MessageSquare size={18} />
-        <span>Reviews</span>
-      </NavLink>
-
-      <NavLink
         to="/admin/analytics"
         className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
       >

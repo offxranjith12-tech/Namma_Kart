@@ -75,48 +75,86 @@ export const Orders = () => {
           </Link>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           {orders.map((order) => (
-            <Link
-              key={order.id}
-              to={`/orders/${order.id}`}
-              className="card"
-              style={{
-                padding: '1.25rem',
-                textDecoration: 'none',
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                gap: '1rem',
-              }}
-            >
-              <div>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-                  <span style={{ fontWeight: 900, fontSize: '1.05rem', color: 'var(--color-text-main)' }}>
-                    Order #NK{order.id}
-                  </span>
-                  {getStatusBadge(order.status)}
-                </div>
-
-                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '0.4rem' }}>
-                  Placed on {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                </p>
-
-                <div style={{ fontSize: '0.88rem', color: 'var(--color-text-main)' }}>
-                  <strong>{order.items?.length || 0} items</strong> &bull; Total: <strong style={{ color: 'var(--color-primary)' }}>₹{order.totalAmount}</strong>
-                  {order.deliveryPersonName && (
-                    <span style={{ marginLeft: '0.75rem', color: 'var(--color-text-muted)' }}>
-                      &bull; Delivery Agent: {order.deliveryPersonName}
+            <div key={order.id} className="card" style={{ padding: '0' }}>
+              {/* Card Header: Order ID & Status */}
+              <div style={{ padding: '1.25rem', borderBottom: '1px solid var(--color-border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '1rem' }}>
+                <div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
+                    <span style={{ fontWeight: 900, fontSize: '1.1rem', color: 'var(--color-text-main)' }}>
+                      Order #NK{order.id}
                     </span>
-                  )}
+                    {getStatusBadge(order.status)}
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                    Placed on {new Date(order.createdAt).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+                
+                <div style={{ textAlign: 'right' }}>
+                  <div style={{ fontWeight: 800, fontSize: '1.1rem', color: 'var(--color-primary)', marginBottom: '0.2rem' }}>
+                    ₹{order.totalAmount}
+                  </div>
+                  <span className="badge badge-soft" style={{ fontSize: '0.75rem' }}>
+                    {order.paymentMethod} &bull; {order.paymentStatus}
+                  </span>
                 </div>
               </div>
 
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary)', fontWeight: 700, fontSize: '0.9rem' }}>
-                <span>Track Order</span>
-                <ChevronRight size={18} />
+              {/* Card Body: Items & Driver */}
+              <div style={{ padding: '1.25rem' }}>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem' }}>
+                  
+                  {/* Items List */}
+                  <div>
+                    <h4 style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.75rem', color: 'var(--color-text-main)' }}>Items ({order.items?.length || 0})</h4>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {order.items?.map(item => (
+                        <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
+                          <span style={{ color: 'var(--color-text)' }}>{item.quantity}x {item.productName}</span>
+                          <span style={{ fontWeight: 600 }}>₹{item.subtotal}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Delivery Info */}
+                  <div>
+                    <h4 style={{ fontWeight: 700, fontSize: '0.95rem', marginBottom: '0.75rem', color: 'var(--color-text-main)' }}>Delivery Info</h4>
+                    {order.deliveryPersonName ? (
+                      <div className="card-soft" style={{ padding: '1rem', display: 'flex', alignItems: 'center', gap: '0.75rem', border: '1px solid var(--color-primary-20)' }}>
+                        <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: '50%', backgroundColor: 'var(--color-primary)', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                          <Truck size={18} />
+                        </div>
+                        <div>
+                          <div style={{ fontWeight: 800, fontSize: '0.9rem' }}>{order.deliveryPersonName}</div>
+                          <div style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', marginTop: '0.1rem' }}>
+                            {order.deliveryPersonPhone ? `📞 ${order.deliveryPersonPhone}` : 'Delivery Agent Assigned'}
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="card-soft" style={{ padding: '1rem', color: 'var(--color-text-muted)', fontSize: '0.88rem' }}>
+                        <Clock size={16} style={{ display: 'inline', marginRight: '0.5rem', verticalAlign: 'middle' }} />
+                        Partner will be assigned soon.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
-            </Link>
+
+              {/* Card Footer: Actions */}
+              <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--color-surface)', borderTop: '1px solid var(--color-border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
+                  Slot: <strong>{order.slotName}</strong> ({order.slotTime})
+                </span>
+                <Link to={`/orders/${order.id}`} className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                  <span>Track Full Details</span>
+                  <ChevronRight size={16} />
+                </Link>
+              </div>
+            </div>
           ))}
         </div>
       )}

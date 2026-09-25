@@ -19,6 +19,8 @@ export const AdminProducts = () => {
     unit: '1 kg',
     imageUrl: '',
     discount: '0',
+    minQuantity: 1,
+    maxQuantity: 50,
     active: true,
   });
 
@@ -55,6 +57,8 @@ export const AdminProducts = () => {
       unit: '1 kg',
       imageUrl: 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60',
       discount: '0',
+      minQuantity: 1,
+      maxQuantity: 50,
       active: true,
     });
     setShowModal(true);
@@ -71,6 +75,8 @@ export const AdminProducts = () => {
       unit: product.unit,
       imageUrl: product.imageUrl || '',
       discount: product.discount || '0',
+      minQuantity: product.minQuantity || 1,
+      maxQuantity: product.maxQuantity || 50,
       active: product.active,
     });
     setShowModal(true);
@@ -85,6 +91,8 @@ export const AdminProducts = () => {
         price: Number(formData.price),
         stock: Number(formData.stock),
         discount: Number(formData.discount),
+        minQuantity: Number(formData.minQuantity),
+        maxQuantity: Number(formData.maxQuantity),
       };
 
       if (editingProduct) {
@@ -220,6 +228,30 @@ export const AdminProducts = () => {
                       placeholder="e.g. 1 kg, 500 g, 1 L"
                       value={formData.unit}
                       onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem', marginBottom: '0.75rem' }}>
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Min Quantity Limit</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={formData.minQuantity}
+                      onChange={(e) => setFormData({ ...formData, minQuantity: e.target.value })}
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group" style={{ marginBottom: 0 }}>
+                    <label className="form-label">Max Quantity Limit</label>
+                    <input
+                      type="number"
+                      className="form-control"
+                      value={formData.maxQuantity}
+                      onChange={(e) => setFormData({ ...formData, maxQuantity: e.target.value })}
                       required
                     />
                   </div>

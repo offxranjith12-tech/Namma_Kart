@@ -8,6 +8,22 @@ export const Home = () => {
   const [categories, setCategories] = useState([]);
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const heroImages = [
+    '/assets/carousel/slide1.jpg',
+    '/assets/carousel/slide2.jpg',
+    '/assets/carousel/slide3.jpg',
+    '/assets/carousel/slide4.jpg',
+    '/assets/carousel/slide5.jpg'
+  ];
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % heroImages.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, []);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,8 +61,22 @@ export const Home = () => {
       </div>
 
       {/* Hero Section */}
-      <section className="hero-section">
-        <div className="container">
+      <section className="hero-section" style={{ position: 'relative', overflow: 'hidden' }}>
+        {/* Background Carousel */}
+        {heroImages.map((img, index) => (
+          <div 
+            key={index}
+            className="hero-carousel-slide"
+            style={{
+              backgroundImage: `url(${img})`,
+              opacity: currentSlide === index ? 1 : 0,
+            }}
+          />
+        ))}
+        {/* Overlay to ensure text readability with a nice gradient */}
+        <div className="hero-carousel-overlay"></div>
+        
+        <div className="container" style={{ position: 'relative', zIndex: 2 }}>
           <div className="hero-content">
             <div>
               <div

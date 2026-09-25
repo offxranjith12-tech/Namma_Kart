@@ -22,6 +22,7 @@ export const Checkout = () => {
   const [couponCode, setCouponCode] = useState(initialCoupon);
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
+  const [deliveryType, setDeliveryType] = useState('STANDARD');
 
   // New Address Form toggle
   const [showNewAddress, setShowNewAddress] = useState(false);
@@ -118,7 +119,7 @@ export const Checkout = () => {
       showToast('Please select or add a delivery address', 'error');
       return;
     }
-    if (!selectedSlotId) {
+    if (deliveryType === 'SCHEDULED' && !selectedSlotId) {
       showToast('Please select a delivery time slot', 'error');
       return;
     }
@@ -282,11 +283,50 @@ export const Checkout = () => {
             </div>
           </div>
 
-          {/* 2. Delivery Slot Selection */}
+          {/* 2. Delivery Speed */}
           <div className="card" style={{ padding: '1.5rem' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
+              <CheckCircle2 size={20} color="var(--color-primary)" />
+              <h3 style={{ fontWeight: 800, fontSize: '1.15rem' }}>2. Delivery Speed</h3>
+            </div>
+
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
+              {[
+                { type: 'STANDARD', label: 'Standard Delivery', desc: cart.totalAmount >= 500 ? 'FREE' : '₹30 Charge' },
+                { type: 'EXPRESS', label: 'Express Delivery ⚡', desc: '₹50 Charge (Under 30 mins)' },
+                { type: 'SCHEDULED', label: 'Scheduled Delivery 🕐', desc: 'Choose a time slot below' },
+              ].map((opt) => (
+                <div
+                  key={opt.type}
+                  onClick={() => setDeliveryType(opt.type)}
+                  className={deliveryType === opt.type ? 'delivery-card-active' : ''}
+                  style={{
+                    padding: '1rem',
+                    borderRadius: 'var(--radius-md)',
+                    border: deliveryType === opt.type ? '2px solid var(--color-primary)' : '1px solid var(--color-border)',
+                    backgroundColor: deliveryType === opt.type ? 'var(--color-primary-10)' : 'var(--color-surface)',
+                    cursor: 'pointer',
+                    transition: 'all 240ms ease-out',
+                  }}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
+                    <span style={{ fontWeight: 800, fontSize: '0.92rem' }}>{opt.label}</span>
+                    {deliveryType === opt.type && <CheckCircle2 size={16} color="var(--color-primary)" />}
+                  </div>
+                  <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)' }}>
+                    {opt.desc}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* 2.5 Delivery Slot Selection (Only for Scheduled) */}
+          {deliveryType === 'SCHEDULED' && (
+          <div className="card animate-pop-in" style={{ padding: '1.5rem' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.25rem' }}>
               <Clock size={20} color="var(--color-primary)" />
-              <h3 style={{ fontWeight: 800, fontSize: '1.15rem' }}>2. Delivery Time Slot</h3>
+              <h3 style={{ fontWeight: 800, fontSize: '1.15rem' }}>Select Time Slot</h3>
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
@@ -314,6 +354,7 @@ export const Checkout = () => {
               ))}
             </div>
           </div>
+          )}
 
           {/* 3. Payment Method */}
           <div className="card" style={{ padding: '1.5rem' }}>
@@ -454,7 +495,7 @@ export const Checkout = () => {
               <hr style={{ borderColor: 'var(--color-border)', margin: '0.5rem 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 900 }}>
                 <span>Total Amount</span>
-                <span style={{ color: 'var(--color-primary)' }}>₹{cart.totalAmount}</span>
+                <span style={{ color: 'var(--color-primary)' }}>₹{deliveryType === 'EXPRESS' ? cart.totalAmount + 50 : cart.totalAmount}</span>
               </div>
             </div>
 

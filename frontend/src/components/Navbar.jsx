@@ -87,22 +87,7 @@ export const Navbar = () => {
         <div className="container navbar-inner">
           {/* Brand */}
           <Link to={isAdmin ? "/admin" : isDeliveryPerson ? "/delivery" : "/"} className="nav-brand">
-            <div
-              style={{
-                width: '2.4rem',
-                height: '2.4rem',
-                borderRadius: 'var(--radius-full)',
-                backgroundColor: 'var(--color-primary)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: 'var(--color-text-inverse)',
-                boxShadow: '0 2px 8px var(--color-primary-20)',
-              }}
-            >
-              <ShoppingBag size={20} strokeWidth={2.5} />
-            </div>
-            <span>Namma Kart</span>
+            <img src="/logo.png" alt="Namma Kart" style={{ height: '68px', width: 'auto', objectFit: 'contain' }} />
             {isAdmin && <span className="nav-brand-tag">ADMIN</span>}
             {isDeliveryPerson && <span className="nav-brand-tag">DELIVERY</span>}
           </Link>
@@ -209,9 +194,15 @@ export const Navbar = () => {
                 </button>
 
                 {isAuthenticated && (
-                  <Link to="/wishlist" className="nav-btn desktop-only" title="Wishlist">
-                    <Heart size={18} />
-                  </Link>
+                  <>
+                    <Link to="/orders" className="nav-btn desktop-only" title="My Orders">
+                      <Package size={18} />
+                      <span className="desktop-only" style={{ marginLeft: '4px' }}>Orders</span>
+                    </Link>
+                    <Link to="/wishlist" className="nav-btn desktop-only" title="Wishlist">
+                      <Heart size={18} />
+                    </Link>
+                  </>
                 )}
 
                 <Link to="/cart" className="nav-btn" title="Cart">
@@ -354,11 +345,9 @@ export const Navbar = () => {
           <div className="mobile-drawer-content" onClick={(e) => e.stopPropagation()}>
             {/* Drawer Header */}
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', borderBottom: '1.5px solid var(--color-border)', paddingBottom: '0.75rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <div style={{ width: '2rem', height: '2rem', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-inverse)' }}>
-                  <ShoppingBag size={16} />
-                </div>
-                <strong style={{ fontSize: '1.15rem', color: 'var(--color-primary)' }}>Namma Kart</strong>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                <img src="/logo.png" alt="Namma Kart" style={{ height: '56px', width: 'auto', objectFit: 'contain' }} />
+                <strong style={{ fontSize: '1.2rem', color: 'var(--color-primary)' }}>Namma Kart</strong>
               </div>
               <button
                 type="button"

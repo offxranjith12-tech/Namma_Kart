@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Heart, Plus, Minus, Star } from 'lucide-react';
+import { Heart, Plus, Minus, Star, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useAuth } from '../context/AuthContext';
@@ -10,6 +10,7 @@ export const ProductCard = ({ product }) => {
   const { isInWishlist, toggleWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
+  const [isAdding, setIsAdding] = useState(false);
 
   if (!product) return null;
 
@@ -58,7 +59,12 @@ export const ProductCard = ({ product }) => {
       }, 400);
     }
 
+    setIsAdding(true);
     addToCart(product.id, 1);
+    
+    setTimeout(() => {
+      setIsAdding(false);
+    }, 1000);
   };
 
   const handleBuyNow = (e) => {
@@ -84,11 +90,12 @@ export const ProductCard = ({ product }) => {
     <div className="product-card">
       {/* Image & Badges */}
       <div className="product-image-wrap">
-        <Link to={`/products/${product.id}`} style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center' }}>
+        <Link to={`/products/${product.id}`} style={{ display: 'flex', width: '100%', height: '100%', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
           <img
             src={product.imageUrl || 'https://images.unsplash.com/photo-1542838132-92c53300491e?w=500&auto=format&fit=crop&q=60'}
             alt={product.name}
             loading="lazy"
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           />
         </Link>
 
@@ -125,7 +132,57 @@ export const ProductCard = ({ product }) => {
         <Link to={`/products/${product.id}`} style={{ textDecoration: 'none' }}>
           <h4 className="product-name">{product.name}</h4>
         </Link>
-        <p className="product-unit">{product.unit}</p>
+        <p className="product-unit" style={{ marginBottom: '0.2rem' }}>{product.unit}</p>
+        <p style={{ fontSize: '0.75rem', color: 'var(--color-primary-hover)', fontWeight: 600 }}>
+          {product.stock} units available
+        </p>
+
+        {/* Quick Quantity Chips */}
+        {product.minQuantity > 0 && product.unit && product.unit.match(/g|kg|L|ml/i) && (
+          <div style={{ display: 'flex', gap: '0.4rem', marginTop: '0.6rem', flexWrap: 'wrap' }}>
+            {[1, 2, 4].map(multiplier => {
+              const weightVal = product.minQuantity * multiplier;
+              if (weightVal > (product.maxQuantity || 50)) return null;
+              
+              let label = `${weightVal}x ${product.unit}`;
+              const unitMatch = product.unit.match(/^([\d.]+)\s*([a-zA-Z]+)$/);
+              if (unitMatch) {
+                const num = parseFloat(unitMatch[1]) * weightVal;
+                let u = unitMatch[2].toLowerCase();
+                if (u === 'g' && num >= 1000) { label = `${num/1000}kg`; }
+                else if (u === 'ml' && num >= 1000) { label = `${num/1000}L`; }
+                else { label = `${num}${u}`; }
+              }
+
+              return (
+                <button 
+                  key={multiplier} 
+                  type="button" 
+                  className="badge"
+                  style={{ 
+                    cursor: 'pointer', 
+                    background: 'var(--color-primary-10)', 
+                    color: 'var(--color-primary-dark)', 
+                    border: '1px solid var(--color-border)',
+                    padding: '0.3rem 0.6rem',
+                    fontSize: '0.7rem'
+                  }}
+                  onClick={(e) => {
+                     e.preventDefault();
+                     if (weightVal <= (product.maxQuantity || product.stockQuantity || 50)) {
+                       if (qty === 0) addToCart(product.id, weightVal);
+                       else updateQuantity(product.id, weightVal);
+                     } else {
+                       alert(`Cannot add more. Limit is ${product.maxQuantity || product.stockQuantity}`);
+                     }
+                  }}
+                >
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Pricing and Action */}
@@ -149,11 +206,19 @@ export const ProductCard = ({ product }) => {
           ) : qty > 0 ? (
             <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
               <div className="qty-control" style={{ flex: 1, justifyContent: 'space-between', padding: '0.1rem 0' }}>
-                <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); updateQuantity(product.id, qty - 1); }}>
+                <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); updateQuantity(product.id, qty - (product.minQuantity || 1)); }}>
                   <Minus size={14} />
                 </button>
                 <span className="qty-val">{qty}</span>
-                <button type="button" className="qty-btn" onClick={(e) => { e.preventDefault(); updateQuantity(product.id, qty + 1); }}>
+                <button type="button" className="qty-btn" onClick={(e) => { 
+                  e.preventDefault(); 
+                  const nextQty = qty + (product.minQuantity || 1);
+                  if (nextQty <= (product.maxQuantity || product.stockQuantity || 50)) {
+                    updateQuantity(product.id, nextQty);
+                  } else {
+                    alert(`Cannot add more. Limit is ${product.maxQuantity || product.stockQuantity}`);
+                  }
+                }}>
                   <Plus size={14} />
                 </button>
               </div>
@@ -163,8 +228,8 @@ export const ProductCard = ({ product }) => {
             </div>
           ) : (
             <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-              <button type="button" className="btn btn-outline btn-sm" style={{ flex: 1, padding: '0.45rem 0' }} onClick={(e) => handleAddToCart(e)}>
-                Add
+              <button type="button" className="btn btn-outline btn-sm" style={{ flex: 1, padding: '0.45rem 0' }} onClick={(e) => handleAddToCart(e)} disabled={isAdding}>
+                {isAdding ? <Check size={16} /> : 'Add'}
               </button>
               <button type="button" className="btn btn-primary btn-glue btn-sm" style={{ flex: 1, padding: '0.45rem 0' }} onClick={handleBuyNow}>
                 Buy Now
