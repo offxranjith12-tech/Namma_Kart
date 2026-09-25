@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingBag, ChevronRight, Clock, Truck, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ShoppingBag, ChevronRight, Clock, Truck, CheckCircle2, AlertCircle, Download } from 'lucide-react';
 import { ordersAPI } from '../services/api';
+import { downloadReceipt } from '../utils/receiptGenerator';
 
 export const Orders = () => {
   const [orders, setOrders] = useState([]);
@@ -145,14 +146,27 @@ export const Orders = () => {
               </div>
 
               {/* Card Footer: Actions */}
-              <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--color-surface)', borderTop: '1px solid var(--color-border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ padding: '1rem 1.25rem', backgroundColor: 'var(--color-surface)', borderTop: '1px solid var(--color-border-subtle)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem' }}>
                 <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>
                   Slot: <strong>{order.slotName}</strong> ({order.slotTime})
                 </span>
-                <Link to={`/orders/${order.id}`} className="btn btn-outline btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                  <span>Track Full Details</span>
-                  <ChevronRight size={16} />
-                </Link>
+                
+                <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+                  {order.status === 'DELIVERED' && (
+                    <button
+                      type="button"
+                      className="btn btn-outline btn-sm"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', color: 'var(--color-primary)', borderColor: 'var(--color-primary-30)' }}
+                      onClick={() => downloadReceipt(order)}
+                    >
+                      <Download size={14} /> Receipt
+                    </button>
+                  )}
+                  <Link to={`/orders/${order.id}`} className="btn btn-primary btn-sm" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+                    <span>Track Order</span>
+                    <ChevronRight size={16} />
+                  </Link>
+                </div>
               </div>
             </div>
           ))}

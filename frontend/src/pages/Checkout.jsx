@@ -466,11 +466,18 @@ export const Checkout = () => {
 
             <div style={{ maxHeight: '220px', overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '0.65rem', marginBottom: '1.25rem', paddingRight: '0.25rem' }}>
               {cart.items.map((item) => (
-                <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-                  <span style={{ color: 'var(--color-text-main)', flex: 1, paddingRight: '0.5rem' }}>
-                    {item.productName} <span style={{ color: 'var(--color-text-muted)' }}>&times; {item.quantity}</span>
-                  </span>
-                  <span style={{ fontWeight: 700 }}>₹{item.itemTotal}</span>
+                <div key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
+                    <span style={{ color: 'var(--color-text-main)', flex: 1, paddingRight: '0.5rem' }}>
+                      {item.productName} <span style={{ color: 'var(--color-text-muted)' }}>&times; {item.quantity}</span>
+                    </span>
+                    <span style={{ fontWeight: 700 }}>₹{item.itemTotal}</span>
+                  </div>
+                  {item.expiryDate && (
+                    <div style={{ fontSize: '0.75rem', color: item.daysRemaining < 0 ? 'var(--color-danger)' : (item.isNearExpiry ? '#e67e22' : 'var(--color-text-muted)'), fontWeight: 600 }}>
+                      {item.daysRemaining < 0 ? '⚠️ Expired' : `⚠️ Expires: ${new Date(item.expiryDate).toLocaleDateString('en-GB')} (${item.daysRemaining} days)`}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

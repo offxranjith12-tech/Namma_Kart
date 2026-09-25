@@ -52,6 +52,14 @@ export const AdminSidebar = () => {
         <span>Categories</span>
       </NavLink>
 
+      <NavLink
+        to="/admin/expiry"
+        className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+      >
+        <AlertTriangle size={18} />
+        <span>Expiry Management</span>
+      </NavLink>
+
       <div className="sidebar-heading">Logistics & Operations</div>
       <NavLink
         to="/admin/delivery-persons"

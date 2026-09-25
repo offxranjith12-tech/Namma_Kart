@@ -48,4 +48,12 @@ public class ProductDTO {
     private Integer minQuantity;
     private Integer maxQuantity;
     private LocalDateTime createdAt;
+    
+    // Expiry feature fields
+    private java.time.LocalDate manufacturingDate;
+    private java.time.LocalDate expiryDate;
+    private Long daysRemaining;
+    private Boolean isNearExpiry;
+    private Boolean isExpired;
+    private BigDecimal expiryDiscountPercentage;
 }

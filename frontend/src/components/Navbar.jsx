@@ -59,6 +59,9 @@ export const Navbar = () => {
     let interval;
     if (isAuthenticated) {
       const fetchNotifs = () => {
+        const token = localStorage.getItem('token');
+        if (!token) return;
+
         notificationsAPI.getAll().then((res) => {
           if (res.success && res.data) {
             const unread = res.data.filter((n) => !n.isRead).length;
@@ -174,6 +177,10 @@ export const Navbar = () => {
             {/* Customer links */}
             {!isAdmin && !isDeliveryPerson && (
               <>
+                <Link to="/deals/near-expiry" className={`nav-btn desktop-only ${location.pathname === '/deals/near-expiry' ? 'active' : ''}`} style={{ color: '#e67e22' }}>
+                  <span>🔥 Deals</span>
+                </Link>
+
                 <Link to="/products" className={`nav-btn desktop-only ${location.pathname === '/products' ? 'active' : ''}`}>
                   <span>Explore</span>
                 </Link>
@@ -363,6 +370,18 @@ export const Navbar = () => {
 
             {/* Links List */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', flex: 1 }}>
+              <Link to="/" className="sidebar-link">
+                <LayoutDashboard size={18} />
+                <span>Home</span>
+              </Link>
+
+              {!isAdmin && !isDeliveryPerson && (
+                <Link to="/deals/near-expiry" className="sidebar-link" style={{ color: '#e67e22', fontWeight: '600' }}>
+                  <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: '18px' }}>🔥</span>
+                  <span>Near-Expiry Deals</span>
+                </Link>
+              )}
+
               <Link to="/products" className="sidebar-link">
                 <Package size={18} />
                 <span>Explore Catalog</span>

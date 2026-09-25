@@ -6,6 +6,8 @@ import com.grocery.entity.Product;
 import com.grocery.exception.ResourceNotFoundException;
 import com.grocery.repository.CategoryRepository;
 import com.grocery.repository.ProductRepository;
+import com.grocery.repository.ExpiryRuleRepository;
+import com.grocery.entity.ExpiryRule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,6 +23,7 @@ public class ProductService {
 
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final ExpiryRuleRepository expiryRuleRepository;
 
     public List<ProductDTO> getAllActiveProducts() {
         return productRepository.findAllByActiveTrue().stream()
@@ -80,6 +83,8 @@ public class ProductService {
                 .active(dto.getActive() != null ? dto.getActive() : true)
                 .minQuantity(dto.getMinQuantity() != null ? dto.getMinQuantity() : 1)
                 .maxQuantity(dto.getMaxQuantity() != null ? dto.getMaxQuantity() : 50)
+                .manufacturingDate(dto.getManufacturingDate())
+                .expiryDate(dto.getExpiryDate())
                 .build();
 
         return mapToDTO(productRepository.save(product));
@@ -107,6 +112,8 @@ public class ProductService {
         if (dto.getActive() != null) product.setActive(dto.getActive());
         if (dto.getMinQuantity() != null) product.setMinQuantity(dto.getMinQuantity());
         if (dto.getMaxQuantity() != null) product.setMaxQuantity(dto.getMaxQuantity());
+        if (dto.getManufacturingDate() != null) product.setManufacturingDate(dto.getManufacturingDate());
+        if (dto.getExpiryDate() != null) product.setExpiryDate(dto.getExpiryDate());
 
         return mapToDTO(productRepository.save(product));
     }
@@ -129,6 +136,38 @@ public class ProductService {
             discountedPrice = price.multiply(discountMultiplier).setScale(2, RoundingMode.HALF_UP);
         }
 
+        Long daysRemaining = null;
+        Boolean isNearExpiry = false;
+        Boolean isExpired = false;
+        BigDecimal expiryDiscountPercentage = null;
+
+        if (product.getExpiryDate() != null) {
+            java.time.LocalDate today = java.time.LocalDate.now();
+            daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(today, product.getExpiryDate());
+            
+            if (daysRemaining < 0) {
+                isExpired = true;
+                discountedPrice = BigDecimal.ZERO; // Not for sale
+            } else {
+                // Find matching expiry rule
+                List<ExpiryRule> rules = expiryRuleRepository.findByActiveTrue();
+                for (ExpiryRule rule : rules) {
+                    if (daysRemaining >= rule.getMinDays() && daysRemaining <= rule.getMaxDays()) {
+                        isNearExpiry = true;
+                        expiryDiscountPercentage = rule.getDiscountPercentage();
+                        break;
+                    }
+                }
+                
+                if (isNearExpiry && expiryDiscountPercentage != null) {
+                    // Override normal discount if near expiry discount applies
+                    discount = expiryDiscountPercentage;
+                    BigDecimal discountMultiplier = BigDecimal.ONE.subtract(discount.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+                    discountedPrice = price.multiply(discountMultiplier).setScale(2, RoundingMode.HALF_UP);
+                }
+            }
+        }
+
         return ProductDTO.builder()
                 .id(product.getId())
                 .categoryId(product.getCategory().getId())
@@ -139,13 +178,19 @@ public class ProductService {
                 .stock(product.getStock())
                 .unit(product.getUnit())
                 .imageUrl(product.getImageUrl())
-                .discount(product.getDiscount())
+                .discount(discount)
                 .discountedPrice(discountedPrice)
                 .rating(product.getRating())
-                .active(product.getActive())
+                .active(product.getActive() && !isExpired)
                 .minQuantity(product.getMinQuantity())
                 .maxQuantity(product.getMaxQuantity())
                 .createdAt(product.getCreatedAt())
+                .manufacturingDate(product.getManufacturingDate())
+                .expiryDate(product.getExpiryDate())
+                .daysRemaining(daysRemaining)
+                .isNearExpiry(isNearExpiry)
+                .isExpired(isExpired)
+                .expiryDiscountPercentage(expiryDiscountPercentage)
                 .build();
     }
 }

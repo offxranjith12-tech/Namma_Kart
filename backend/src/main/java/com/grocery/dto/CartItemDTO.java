@@ -23,4 +23,8 @@ public class CartItemDTO {
     private Integer quantity;
     private Integer stock;
     private BigDecimal itemTotal;
+    
+    private java.time.LocalDate expiryDate;
+    private Long daysRemaining;
+    private Boolean isNearExpiry;
 }

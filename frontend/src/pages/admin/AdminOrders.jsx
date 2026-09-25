@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingBag, Truck, Check, Filter, ChevronRight, UserCheck } from 'lucide-react';
+import { ShoppingBag, Truck, Check, Filter, ChevronRight, UserCheck, Download } from 'lucide-react';
 import { adminAPI } from '../../services/api';
 import { AdminSidebar } from '../../components/AdminSidebar';
 import { useToast } from '../../context/ToastContext';
+import { downloadReceipt } from '../../utils/receiptGenerator';
 
 export const AdminOrders = () => {
   const [orders, setOrders] = useState([]);
@@ -28,6 +29,9 @@ export const AdminOrders = () => {
   }, [statusFilter]);
 
   const fetchOrders = async (silent = false) => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+
     try {
       if (!silent) setLoading(true);
       const res = await adminAPI.getOrders(statusFilter || null);
@@ -35,7 +39,9 @@ export const AdminOrders = () => {
         setOrders(res.data);
       }
     } catch (err) {
-      console.error('Failed to load orders:', err);
+      if (!err.message?.includes('Unauthorized')) {
+        console.error('Failed to load orders:', err);
+      }
     } finally {
       if (!silent) setLoading(false);
     }
@@ -184,16 +190,29 @@ export const AdminOrders = () => {
                       </td>
 
                       <td>
-                        <button
-                          type="button"
-                          className="btn btn-outline btn-sm"
-                          onClick={() => {
-                            setSelectedOrder(order);
-                            setAssigningDpId(order.deliveryPersonId || '');
-                          }}
-                        >
-                          Manage
-                        </button>
+                        <div style={{ display: 'flex', gap: '0.4rem', flexWrap: 'wrap' }}>
+                          <button
+                            type="button"
+                            className="btn btn-outline btn-sm"
+                            onClick={() => {
+                              setSelectedOrder(order);
+                              setAssigningDpId(order.deliveryPersonId || '');
+                            }}
+                          >
+                            Manage
+                          </button>
+                          {order.status === 'DELIVERED' && (
+                            <button
+                              type="button"
+                              className="btn btn-primary btn-sm"
+                              style={{ padding: '0.3rem 0.5rem', fontSize: '0.78rem', display: 'inline-flex', alignItems: 'center', gap: '0.2rem' }}
+                              onClick={() => downloadReceipt(order)}
+                              title="Download Tax Receipt PDF"
+                            >
+                              <Download size={13} /> Receipt
+                            </button>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -289,10 +308,23 @@ export const AdminOrders = () => {
                     </div>
                   ))}
                 </div>
-                <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', fontWeight: 900 }}>
+                <div style={{ marginTop: '0.75rem', paddingTop: '0.5rem', borderTop: '1px solid var(--color-border)', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontWeight: 900 }}>
                   <span>Total Amount:</span>
                   <span style={{ color: 'var(--color-primary)' }}>₹{selectedOrder.totalAmount}</span>
                 </div>
+
+                {selectedOrder.status === 'DELIVERED' && (
+                  <div style={{ marginTop: '1.25rem', textAlign: 'right' }}>
+                    <button
+                      type="button"
+                      className="btn btn-primary"
+                      style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', width: '100%', justifyContent: 'center' }}
+                      onClick={() => downloadReceipt(selectedOrder)}
+                    >
+                      <Download size={16} /> Download Tax Receipt PDF
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>

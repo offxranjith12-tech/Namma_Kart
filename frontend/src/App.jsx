@@ -22,6 +22,7 @@ import { Addresses } from './pages/Addresses';
 import { Notifications } from './pages/Notifications';
 import { GroceryLists } from './pages/GroceryLists';
 import { ShoppingAnalytics } from './pages/ShoppingAnalytics';
+import { NearExpiryDeals } from './pages/NearExpiryDeals';
 
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -33,6 +34,7 @@ import { AdminDeliverySlots } from './pages/admin/AdminDeliverySlots';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminUsers } from './pages/admin/AdminUsers';
 import { AdminAnalytics } from './pages/admin/AdminAnalytics';
+import { ExpiryManagement } from './pages/admin/ExpiryManagement';
 // Delivery Pages
 import { DeliveryDashboard } from './pages/delivery/DeliveryDashboard';
 import { DeliveryOrders } from './pages/delivery/DeliveryOrders';
@@ -96,6 +98,7 @@ export const App = () => {
           <Route path="/register" element={<PublicCustomerRoute><Register /></PublicCustomerRoute>} />
           <Route path="/products" element={<PublicCustomerRoute><Products /></PublicCustomerRoute>} />
           <Route path="/products/:id" element={<PublicCustomerRoute><ProductDetails /></PublicCustomerRoute>} />
+          <Route path="/deals/near-expiry" element={<PublicCustomerRoute><NearExpiryDeals /></PublicCustomerRoute>} />
           <Route path="/cart" element={<PublicCustomerRoute><Cart /></PublicCustomerRoute>} />
           
           <Route
@@ -225,6 +228,14 @@ export const App = () => {
             element={
               <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
                 <AdminCoupons />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin/expiry"
+            element={
+              <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                <ExpiryManagement />
               </ProtectedRoute>
             }
           />

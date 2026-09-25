@@ -22,6 +22,8 @@ export const AdminProducts = () => {
     minQuantity: 1,
     maxQuantity: 50,
     active: true,
+    manufacturingDate: '',
+    expiryDate: '',
   });
 
   const { showToast } = useToast();
@@ -60,6 +62,8 @@ export const AdminProducts = () => {
       minQuantity: 1,
       maxQuantity: 50,
       active: true,
+      manufacturingDate: '',
+      expiryDate: '',
     });
     setShowModal(true);
   };
@@ -78,6 +82,8 @@ export const AdminProducts = () => {
       minQuantity: product.minQuantity || 1,
       maxQuantity: product.maxQuantity || 50,
       active: product.active,
+      manufacturingDate: product.manufacturingDate || '',
+      expiryDate: product.expiryDate || '',
     });
     setShowModal(true);
   };
@@ -93,6 +99,8 @@ export const AdminProducts = () => {
         discount: Number(formData.discount),
         minQuantity: Number(formData.minQuantity),
         maxQuantity: Number(formData.maxQuantity),
+        manufacturingDate: formData.manufacturingDate || null,
+        expiryDate: formData.expiryDate || null,
       };
 
       if (editingProduct) {
@@ -275,6 +283,28 @@ export const AdminProducts = () => {
                       className="form-control"
                       value={formData.imageUrl}
                       onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginTop: '0.75rem' }}>
+                  <div className="form-group">
+                    <label className="form-label">Manufacturing Date</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={formData.manufacturingDate}
+                      onChange={(e) => setFormData({ ...formData, manufacturingDate: e.target.value })}
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Expiry Date</label>
+                    <input
+                      type="date"
+                      className="form-control"
+                      value={formData.expiryDate}
+                      onChange={(e) => setFormData({ ...formData, expiryDate: e.target.value })}
                     />
                   </div>
                 </div>

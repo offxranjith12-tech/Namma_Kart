@@ -28,14 +28,14 @@ apiClient.interceptors.response.use(
     if (error.response) {
       if (error.response.status === 401) {
         // Clear token if invalid / expired
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
         const currentPath = window.location.pathname;
         if (currentPath !== '/login' && currentPath !== '/register') {
-          localStorage.removeItem('token');
-          localStorage.removeItem('user');
-          // Optional redirect if necessary
+          window.location.href = '/login';
         }
       }
-      const message = error.response.data?.message || 'Something went wrong. Please try again.';
+      const message = error.response.data?.message || 'Unauthorized: Please log in to access this resource';
       return Promise.reject(new Error(message));
     }
     return Promise.reject(new Error('Network error. Please check your connection.'));

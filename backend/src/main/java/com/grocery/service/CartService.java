@@ -13,6 +13,8 @@ import com.grocery.repository.CartItemRepository;
 import com.grocery.repository.CartRepository;
 import com.grocery.repository.ProductRepository;
 import com.grocery.repository.UserRepository;
+import com.grocery.repository.ExpiryRuleRepository;
+import com.grocery.entity.ExpiryRule;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,6 +32,7 @@ public class CartService {
     private final CartItemRepository cartItemRepository;
     private final ProductRepository productRepository;
     private final UserRepository userRepository;
+    private final ExpiryRuleRepository expiryRuleRepository;
 
     @Transactional
     public CartDTO getUserCart(Long userId) {
@@ -45,6 +48,13 @@ public class CartService {
 
         if (!product.getActive()) {
             throw new BadRequestException("Product is currently unavailable");
+        }
+
+        if (product.getExpiryDate() != null) {
+            long daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDate.now(), product.getExpiryDate());
+            if (daysRemaining < 0) {
+                throw new BadRequestException("This product has expired and cannot be added to cart.");
+            }
         }
 
         if (product.getStock() < request.getQuantity()) {
@@ -141,8 +151,30 @@ public class CartService {
             BigDecimal originalPrice = product.getPrice();
             BigDecimal discount = product.getDiscount() != null ? product.getDiscount() : BigDecimal.ZERO;
             BigDecimal effectivePrice = originalPrice;
+            
+            Long daysRemaining = null;
+            Boolean isNearExpiry = false;
 
-            if (discount.compareTo(BigDecimal.ZERO) > 0) {
+            if (product.getExpiryDate() != null) {
+                java.time.LocalDate today = java.time.LocalDate.now();
+                daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(today, product.getExpiryDate());
+                
+                if (daysRemaining < 0) {
+                    // Item expired in cart
+                    effectivePrice = BigDecimal.ZERO; 
+                } else {
+                    List<ExpiryRule> rules = expiryRuleRepository.findByActiveTrue();
+                    for (ExpiryRule rule : rules) {
+                        if (daysRemaining >= rule.getMinDays() && daysRemaining <= rule.getMaxDays()) {
+                            isNearExpiry = true;
+                            discount = rule.getDiscountPercentage();
+                            break;
+                        }
+                    }
+                }
+            }
+
+            if (discount.compareTo(BigDecimal.ZERO) > 0 && !(daysRemaining != null && daysRemaining < 0)) {
                 BigDecimal multiplier = BigDecimal.ONE.subtract(discount.divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
                 effectivePrice = originalPrice.multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
             }
@@ -167,6 +199,9 @@ public class CartService {
                     .quantity(item.getQuantity())
                     .stock(product.getStock())
                     .itemTotal(itemTotal)
+                    .expiryDate(product.getExpiryDate())
+                    .daysRemaining(daysRemaining)
+                    .isNearExpiry(isNearExpiry)
                     .build());
         }
 

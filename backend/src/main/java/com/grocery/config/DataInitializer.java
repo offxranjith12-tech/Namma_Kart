@@ -28,6 +28,8 @@ import com.grocery.repository.OrderRepository;
 import com.grocery.repository.ProductRepository;
 import com.grocery.repository.ReviewRepository;
 import com.grocery.repository.UserRepository;
+import com.grocery.repository.ExpiryRuleRepository;
+import com.grocery.entity.ExpiryRule;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
@@ -58,11 +60,17 @@ public class DataInitializer implements CommandLineRunner {
     private final OrderItemRepository orderItemRepository;
     private final ReviewRepository reviewRepository;
     private final NotificationRepository notificationRepository;
+    private final ExpiryRuleRepository expiryRuleRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
     public void run(String... args) {
+        if (expiryRuleRepository.count() == 0) {
+            expiryRuleRepository.save(ExpiryRule.builder().minDays(3).maxDays(7).discountPercentage(BigDecimal.valueOf(20.0)).active(true).build());
+            expiryRuleRepository.save(ExpiryRule.builder().minDays(1).maxDays(2).discountPercentage(BigDecimal.valueOf(43.0)).active(true).build());
+        }
+
         if (userRepository.count() > 0) {
             log.info("Database already initialized with seed data.");
             return;

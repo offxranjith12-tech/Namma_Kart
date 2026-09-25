@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, MapPin, Clock, Truck, ShieldCheck, Star, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, MapPin, Clock, Truck, ShieldCheck, Star, AlertTriangle, Download } from 'lucide-react';
 import { ordersAPI, productsAPI } from '../services/api';
 import { OrderTimeline } from '../components/OrderTimeline';
 import { useToast } from '../context/ToastContext';
+import { downloadReceipt } from '../utils/receiptGenerator';
 
 export const OrderDetails = () => {
   const { id } = useParams();
@@ -119,9 +120,21 @@ export const OrderDetails = () => {
           <div style={{ textAlign: 'right' }}>
             <span style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Total Payable</span>
             <h2 style={{ fontWeight: 900, color: 'var(--color-primary)' }}>₹{order.totalAmount}</h2>
-            <span className="badge badge-soft" style={{ marginTop: '0.25rem' }}>
-              {order.paymentMethod} &bull; {order.paymentStatus}
-            </span>
+            <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end', marginTop: '0.35rem', flexWrap: 'wrap' }}>
+              <span className="badge badge-soft">
+                {order.paymentMethod} &bull; {order.paymentStatus}
+              </span>
+              {isDelivered && (
+                <button
+                  type="button"
+                  className="btn btn-primary btn-sm"
+                  style={{ display: 'inline-flex', alignItems: 'center', gap: '0.35rem', padding: '0.3rem 0.75rem', fontSize: '0.8rem' }}
+                  onClick={() => downloadReceipt(order)}
+                >
+                  <Download size={14} /> Receipt
+                </button>
+              )}
+            </div>
           </div>
         </div>
 

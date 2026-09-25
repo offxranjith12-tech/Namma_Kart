@@ -111,6 +111,11 @@ export const Cart = () => {
                 <p style={{ fontSize: '0.82rem', color: 'var(--color-text-muted)', marginBottom: '0.35rem' }}>
                   {item.productUnit}
                 </p>
+                {item.expiryDate && (
+                  <div style={{ fontSize: '0.75rem', color: item.daysRemaining < 0 ? 'var(--color-danger)' : (item.isNearExpiry ? '#e67e22' : 'var(--color-text-muted)'), marginBottom: '0.35rem', fontWeight: 600 }}>
+                    {item.daysRemaining < 0 ? '⚠️ Expired' : `⚠️ Expires: ${new Date(item.expiryDate).toLocaleDateString('en-GB')} (${item.daysRemaining} days)`}
+                  </div>
+                )}
                 <div style={{ display: 'flex', alignItems: 'baseline', gap: '0.5rem' }}>
                   <span style={{ fontWeight: 800, color: 'var(--color-primary)' }}>
                     ₹{item.effectivePrice}
