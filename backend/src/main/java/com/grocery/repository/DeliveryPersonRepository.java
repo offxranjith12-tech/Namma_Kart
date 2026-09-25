@@ -1,0 +1,16 @@
+package com.grocery.repository;
+
+import com.grocery.entity.DeliveryPerson;
+import com.grocery.entity.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public interface DeliveryPersonRepository extends JpaRepository<DeliveryPerson, Long> {
+    Optional<DeliveryPerson> findByUser(User user);
+    Optional<DeliveryPerson> findByUserId(Long userId);
+    List<DeliveryPerson> findAllByActiveTrue();
+}
