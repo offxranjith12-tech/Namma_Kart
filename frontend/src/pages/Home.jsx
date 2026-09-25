@@ -76,7 +76,7 @@ export const Home = () => {
               </p>
 
               <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-                <Link to="/products" className="btn btn-primary btn-lg">
+                <Link to="/products" className="btn btn-primary btn-glue btn-lg">
                   Shop Now <ArrowRight size={18} />
                 </Link>
                 <Link to="/products?category=1" className="btn btn-soft btn-lg">

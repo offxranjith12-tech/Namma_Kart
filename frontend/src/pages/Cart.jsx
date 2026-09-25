@@ -259,7 +259,7 @@ export const Cart = () => {
 
             <button
               type="button"
-              className="btn btn-primary btn-lg"
+              className="btn btn-primary btn-glue btn-lg"
               style={{ width: '100%', marginTop: '1.5rem' }}
               onClick={() => navigate('/checkout', { state: { appliedCouponCode: appliedCoupon?.code } })}
             >

@@ -102,7 +102,7 @@ export const ProductCard = ({ product }) => {
           ) : (
             <button
               type="button"
-              className="btn btn-primary btn-sm"
+              className="btn btn-primary btn-glue btn-sm"
               style={{ width: '100%' }}
               onClick={() => addToCart(product.id, 1)}
             >

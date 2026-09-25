@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
+import { MobileBottomNav } from './components/MobileBottomNav';
 
 // Pages
 import { Home } from './pages/Home';
@@ -250,6 +251,7 @@ export const App = () => {
       </div>
 
       <Footer />
+      <MobileBottomNav />
     </div>
   );
 };
