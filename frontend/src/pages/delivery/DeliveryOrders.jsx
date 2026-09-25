@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Truck, Phone, MapPin, ChevronRight, Clock, CheckCircle2 } from 'lucide-react';
 import { deliveryAPI } from '../../services/api';
-import { DeliveryNav } from '../../components/DeliveryNav';
+import { DeliverySidebar } from '../../components/DeliverySidebar';
 import { useToast } from '../../context/ToastContext';
 
 export const DeliveryOrders = () => {
@@ -49,10 +49,10 @@ export const DeliveryOrders = () => {
   };
 
   return (
-    <div>
-      <DeliveryNav />
+    <div className="dashboard-layout">
+      <DeliverySidebar />
 
-      <main className="container" style={{ padding: '2rem 1rem 4rem', maxWidth: '850px' }}>
+      <main className="main-content" style={{ padding: '2rem', maxWidth: '850px' }}>
         <div style={{ marginBottom: '1.75rem' }}>
           <h1 style={{ fontWeight: 800, fontSize: '1.85rem' }}>Assigned Deliveries</h1>
           <p style={{ color: 'var(--color-text-muted)', fontSize: '0.92rem' }}>

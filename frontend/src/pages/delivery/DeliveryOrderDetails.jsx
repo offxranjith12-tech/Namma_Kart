@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Phone, MapPin, Clock, ShoppingBag, CheckCircle2, Truck, AlertCircle } from 'lucide-react';
 import { deliveryAPI } from '../../services/api';
-import { DeliveryNav } from '../../components/DeliveryNav';
+import { DeliverySidebar } from '../../components/DeliverySidebar';
 import { useToast } from '../../context/ToastContext';
 
 export const DeliveryOrderDetails = () => {
@@ -66,23 +66,23 @@ export const DeliveryOrderDetails = () => {
 
   if (loading) {
     return (
-      <div>
-        <DeliveryNav />
-        <div className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+      <div className="dashboard-layout">
+        <DeliverySidebar />
+        <main className="main-content" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
           Loading delivery details...
-        </div>
+        </main>
       </div>
     );
   }
 
   if (!order) {
     return (
-      <div>
-        <DeliveryNav />
-        <div className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+      <div className="dashboard-layout">
+        <DeliverySidebar />
+        <main className="main-content" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
           <h2>Order Not Found</h2>
           <Link to="/delivery/orders" className="btn btn-primary" style={{ marginTop: '1rem' }}>Back to Deliveries</Link>
-        </div>
+        </main>
       </div>
     );
   }
@@ -91,10 +91,10 @@ export const DeliveryOrderDetails = () => {
   const isOut = order.status === 'OUT_FOR_DELIVERY';
 
   return (
-    <div>
-      <DeliveryNav />
+    <div className="dashboard-layout">
+      <DeliverySidebar />
 
-      <main className="container" style={{ padding: '2rem 1rem 4rem', maxWidth: '750px' }}>
+      <main className="main-content" style={{ padding: '2rem', maxWidth: '750px' }}>
         <Link to="/delivery/orders" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem', color: 'var(--color-text-muted)' }}>
           <ArrowLeft size={16} /> Back to Assigned Deliveries
         </Link>
@@ -194,7 +194,7 @@ export const DeliveryOrderDetails = () => {
 
         {/* Sticky Action Footer */}
         {!isDelivered ? (
-          <div className="card" style={{ padding: '1.25rem', backgroundColor: '#FFFFFF', border: '2px solid var(--color-primary)', display: 'flex', gap: '1rem' }}>
+          <div className="card" style={{ padding: '1.25rem', backgroundColor: 'var(--color-surface)', border: '2px solid var(--color-primary)', display: 'flex', gap: '1rem' }}>
             {!isOut ? (
               <button
                 type="button"

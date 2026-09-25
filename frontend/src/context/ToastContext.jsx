@@ -41,7 +41,7 @@ export const ToastProvider = ({ children }) => {
               padding: '0.85rem 1.25rem',
               borderRadius: 'var(--radius-full)',
               backgroundColor: toast.type === 'error' ? 'var(--color-surface)' : 'var(--color-primary)',
-              color: toast.type === 'error' ? 'var(--color-text-main)' : '#FFFFFF',
+              color: toast.type === 'error' ? 'var(--color-text-main)' : 'var(--color-text-inverse)',
               border: toast.type === 'error' ? '2px solid var(--color-primary)' : '1px solid var(--color-primary-dark)',
               boxShadow: 'var(--shadow-lg)',
               fontFamily: 'var(--font-family)',

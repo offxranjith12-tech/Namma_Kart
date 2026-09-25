@@ -8,7 +8,7 @@ export const Footer = () => {
       {/* Trust Badges Section - Separated with White Background */}
       <section
         style={{
-          backgroundColor: '#FFFFFF',
+          backgroundColor: 'var(--color-surface)',
           borderTop: '1.5px solid var(--color-border)',
           borderBottom: '1.5px solid var(--color-border)',
           marginTop: '4rem',
@@ -138,7 +138,7 @@ export const Footer = () => {
                     display: 'flex',
                     alignItems: 'center',
                     justifyContent: 'center',
-                    color: '#FFFFFF',
+                    color: 'var(--color-text-inverse)',
                   }}
                 >
                   <ShoppingBag size={16} />

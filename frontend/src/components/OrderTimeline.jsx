@@ -69,7 +69,7 @@ export const OrderTimeline = ({ status }) => {
             key={step.key}
             className={`step-item ${isActive ? 'active' : isCompleted ? 'completed' : ''}`}
           >
-            <div className="step-icon">
+            <div className={`step-icon ${isActive ? 'status-pulse' : ''}`}>
               {isCompleted ? <Check size={18} strokeWidth={3} /> : <IconComponent size={18} />}
             </div>
             <span className="step-label">{step.label}</span>

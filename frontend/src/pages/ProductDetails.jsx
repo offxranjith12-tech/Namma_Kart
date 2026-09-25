@@ -85,7 +85,7 @@ export const ProductDetails = () => {
       {/* Main Details Grid */}
       <div className="product-details-grid">
         {/* Left: Product Image */}
-        <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', position: 'relative' }}>
+        <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'var(--color-surface)', position: 'relative' }}>
           <img
             src={product.imageUrl}
             alt={product.name}
@@ -120,14 +120,14 @@ export const ProductDetails = () => {
                 alignItems: 'center',
                 gap: '0.3rem',
                 backgroundColor: 'var(--color-primary)',
-                color: '#FFFFFF',
+                color: 'var(--color-text-inverse)',
                 padding: '0.25rem 0.6rem',
                 borderRadius: 'var(--radius-full)',
                 fontWeight: 700,
                 fontSize: '0.85rem',
               }}
             >
-              <Star size={14} fill="#FFFFFF" />
+              <Star size={14} fill="var(--color-text-inverse)" />
               <span>{Number(product.rating || 4.5).toFixed(1)}</span>
             </div>
             <span style={{ fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>

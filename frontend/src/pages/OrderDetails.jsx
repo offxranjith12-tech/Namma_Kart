@@ -140,7 +140,7 @@ export const OrderDetails = () => {
               height: '3rem',
               borderRadius: 'var(--radius-full)',
               backgroundColor: 'var(--color-primary)',
-              color: '#FFFFFF',
+              color: 'var(--color-text-inverse)',
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',

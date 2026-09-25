@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Truck, Clock, CheckCircle2, Phone, MapPin, ChevronRight, Package, AlertCircle } from 'lucide-react';
+import { Truck, Clock, CheckCircle2, Phone, MapPin, Package } from 'lucide-react';
 import { deliveryAPI } from '../../services/api';
-import { DeliveryNav } from '../../components/DeliveryNav';
+import { DeliverySidebar } from '../../components/DeliverySidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
@@ -38,21 +38,6 @@ export const DeliveryDashboard = () => {
     }
   };
 
-  const handleAcceptDelivery = async (orderId) => {
-    try {
-      setActionLoading(true);
-      const res = await deliveryAPI.acceptDelivery(orderId);
-      if (res.success) {
-        showToast('Delivery accepted successfully! 🚀');
-        fetchDashboard();
-      }
-    } catch (err) {
-      showToast(err.message || 'Could not accept delivery', 'error');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
   const handleUpdateStatus = async (orderId, targetStatus) => {
     try {
       setActionLoading(true);
@@ -74,11 +59,11 @@ export const DeliveryDashboard = () => {
 
   if (loading) {
     return (
-      <div>
-        <DeliveryNav />
-        <div className="container" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
+      <div className="dashboard-layout">
+        <DeliverySidebar />
+        <main className="main-content" style={{ padding: '4rem 1rem', textAlign: 'center' }}>
           Loading delivery partner hub...
-        </div>
+        </main>
       </div>
     );
   }
@@ -86,10 +71,10 @@ export const DeliveryDashboard = () => {
   const activeOrders = data?.assignedOrders?.filter((o) => o.status !== 'DELIVERED') || [];
 
   return (
-    <div>
-      <DeliveryNav />
+    <div className="dashboard-layout">
+      <DeliverySidebar />
 
-      <main className="container" style={{ padding: '2rem 1rem 4rem' }}>
+      <main className="main-content" style={{ padding: '2rem' }}>
         {/* Header Greeting */}
         <div style={{ marginBottom: '2rem' }}>
           <span className="badge badge-primary" style={{ marginBottom: '0.5rem' }}>
@@ -204,7 +189,7 @@ export const DeliveryDashboard = () => {
                               className="btn btn-outline btn-sm"
                               style={{ padding: '0.25rem 0.6rem', fontSize: '0.78rem' }}
                             >
-                              <Phone size={13} /> Call {order.customerPhone}
+                              <Phone size={13} /> Call
                             </a>
                           )}
                         </div>
@@ -230,7 +215,7 @@ export const DeliveryDashboard = () => {
                     {/* Action Buttons */}
                     <div style={{ borderTop: '1px solid var(--color-border)', paddingTop: '1rem', display: 'flex', gap: '0.5rem' }}>
                       <Link to={`/delivery/orders/${order.id}`} className="btn btn-soft btn-sm" style={{ flex: 1 }}>
-                        Details & Items
+                        Details
                       </Link>
 
                       {!isOut ? (

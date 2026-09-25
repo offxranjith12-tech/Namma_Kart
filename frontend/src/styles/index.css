@@ -18,13 +18,13 @@
   
   --color-bg: oklch(0.982 0.018 94);
   --color-surface: oklch(0.95 0.025 94);
-  --color-surface-card: #FFFFFF;
+  --color-surface-card: var(--color-surface);
   --color-surface-hover: oklch(0.92 0.03 94);
   
   --color-text-main: oklch(0.25 0.04 151);
   --color-text-muted: oklch(0.45 0.04 151);
   --color-text-subtle: oklch(0.60 0.03 151);
-  --color-text-inverse: #FFFFFF;
+  --color-text-inverse: var(--color-bg);
 
   --color-border: oklch(0.47 0.13 151 / 0.14);
   --color-border-subtle: oklch(0.47 0.13 151 / 0.08);
@@ -61,9 +61,9 @@
   --glow-strong: 0 0 25px oklch(0.47 0.13 151 / 0.55);
 
   /* Transitions */
-  --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-normal: 260ms cubic-bezier(0.16, 1, 0.3, 1);
-  --transition-smooth: 360ms cubic-bezier(0.16, 1, 0.3, 1);
+  --transition-fast: 240ms ease-out;
+  --transition-normal: 240ms ease-out;
+  --transition-smooth: 240ms ease-out;
 }
 
 /* Global Reset & Base */
@@ -206,33 +206,11 @@ a:hover {
   box-shadow: 0 4px 14px oklch(0.47 0.13 151 / 0.28);
 }
 
-.btn-primary::after {
-  content: '';
-  position: absolute;
-  top: -50%;
-  left: -60%;
-  width: 40%;
-  height: 200%;
-  background: linear-gradient(
-    90deg,
-    transparent,
-    rgba(255, 255, 255, 0.35),
-    transparent
-  );
-  transform: rotate(25deg);
-  transition: all 0.65s cubic-bezier(0.16, 1, 0.3, 1);
-  pointer-events: none;
-}
-
 .btn-primary:hover:not(:disabled) {
   background-color: var(--color-primary-dark);
   border-color: var(--color-primary-dark);
   box-shadow: 0 8px 22px oklch(0.47 0.13 151 / 0.48), 0 0 18px oklch(0.47 0.13 151 / 0.3);
   transform: translateY(-2px) scale(1.015);
-}
-
-.btn-primary:hover:not(:disabled)::after {
-  left: 125%;
 }
 
 .btn-outline {
@@ -336,7 +314,7 @@ a:hover {
 }
 
 .form-control:focus {
-  background-color: #FFFFFF;
+  background-color: var(--color-bg);
   border-color: var(--color-primary);
   box-shadow: 0 0 0 3.5px var(--color-primary-15);
 }
@@ -438,7 +416,7 @@ a:hover {
   bottom: 0;
   left: 0;
   right: 0;
-  background: rgba(255, 255, 255, 0.94);
+  background: oklch(0.95 0.025 94 / 0.94);
   backdrop-filter: blur(14px);
   border-top: 1.5px solid var(--color-border);
   box-shadow: 0 -4px 18px oklch(0.47 0.13 151 / 0.12);
@@ -500,7 +478,7 @@ a:hover {
   top: -2px;
   right: -2px;
   background-color: var(--color-primary);
-  color: #FFFFFF;
+  color: var(--color-text-inverse);
   font-size: 0.65rem;
   font-weight: var(--font-weight-heavy);
   width: 1.15rem;
@@ -509,7 +487,7 @@ a:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  border: 1.5px solid #FFFFFF;
+  border: 1.5px solid var(--color-bg);
   animation: badgeGlow 2s infinite ease-in-out;
 }
 
@@ -551,3 +529,72 @@ a:hover {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Namma Kart Subtle Animations (Hackathon) */
+
+/* 1. Hero / Entrance */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.animate-entrance {
+  animation: slideUpFade 240ms ease-out forwards;
+  opacity: 0;
+}
+
+/* 2. Product Card Hover */
+.product-card {
+  transition: all 240ms ease-out;
+}
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px oklch(0.47 0.13 151 / 0.15);
+}
+.product-card-img {
+  transition: transform 240ms ease-out;
+}
+.product-card:hover .product-card-img {
+  transform: scale(1.03);
+}
+
+/* 3. Add to Cart Fly Animation Container */
+.flying-product {
+  position: fixed;
+  z-index: 9999;
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-full);
+  pointer-events: none;
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: var(--shadow-md);
+  opacity: 0;
+}
+
+/* 4. Cart Badge Pop */
+@keyframes popScale {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+.badge-pop {
+  animation: popScale 240ms ease-out forwards;
+}
+
+/* 5. Order Tracking Pulse */
+@keyframes statusPulse {
+  0% { box-shadow: 0 0 0 0 var(--color-primary-30); }
+  70% { box-shadow: 0 0 0 8px oklch(0.47 0.13 151 / 0); }
+  100% { box-shadow: 0 0 0 0 oklch(0.47 0.13 151 / 0); }
+}
+.status-pulse {
+  animation: statusPulse 2s infinite ease-out;
+  border: 2px solid var(--color-primary);
+}
+
+/* 6. Checkout Delivery Card Active */
+.delivery-card-active {
+  transform: translateY(-2px);
+  border-color: var(--color-primary) !important;
+  box-shadow: 0 4px 12px oklch(0.47 0.13 151 / 0.15);
+}
+

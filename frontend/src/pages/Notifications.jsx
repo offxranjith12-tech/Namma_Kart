@@ -59,7 +59,7 @@ export const Notifications = () => {
               className="card"
               style={{
                 padding: '1.25rem',
-                backgroundColor: n.isRead ? '#FFFFFF' : 'var(--color-primary-10)',
+                backgroundColor: n.isRead ? 'var(--color-surface)' : 'var(--color-primary-10)',
                 borderColor: n.isRead ? 'var(--color-border)' : 'var(--color-primary-30)',
                 display: 'flex',
                 justifyContent: 'space-between',

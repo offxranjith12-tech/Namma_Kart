@@ -67,15 +67,15 @@ export const Home = () => {
                 <span>Superfast 30-Minute Neighborhood Delivery</span>
               </div>
 
-              <h1 className="hero-title">
+              <h1 className="hero-title animate-entrance">
                 Fresh Groceries & Daily Needs, <span>Delivered with Trust.</span>
               </h1>
 
-              <p className="hero-desc">
+              <p className="hero-desc animate-entrance" style={{ animationDelay: '60ms' }}>
                 From farm-picked vegetables and fresh dairy to pantry staples, get authentic local quality at unbeatable everyday prices.
               </p>
 
-              <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+              <div className="animate-entrance" style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', animationDelay: '120ms' }}>
                 <Link to="/products" className="btn btn-primary btn-glue btn-lg">
                   Shop Now <ArrowRight size={18} />
                 </Link>
@@ -102,7 +102,7 @@ export const Home = () => {
 
             {/* Promo Highlights */}
             <div className="hero-card-grid">
-              <div className="hero-promo-card">
+              <div className="hero-promo-card animate-entrance" style={{ animationDelay: '180ms' }}>
                 <div>
                   <span className="badge badge-soft" style={{ marginBottom: '0.5rem' }}>TODAY'S SPECIAL</span>
                   <h3 style={{ fontWeight: 800, color: 'var(--color-primary)' }}>Up to 50% OFF</h3>
@@ -111,7 +111,7 @@ export const Home = () => {
                 <Link to="/products" style={{ fontSize: '0.88rem', fontWeight: 700 }}>Grab Deal &rarr;</Link>
               </div>
 
-              <div className="hero-promo-card">
+              <div className="hero-promo-card animate-entrance" style={{ animationDelay: '240ms' }}>
                 <div>
                   <span className="badge badge-soft" style={{ marginBottom: '0.5rem' }}>FARM FRESH</span>
                   <h3 style={{ fontWeight: 800, color: 'var(--color-primary)' }}>Daily Harvest</h3>

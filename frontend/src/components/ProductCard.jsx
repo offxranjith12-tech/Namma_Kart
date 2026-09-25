@@ -13,11 +13,51 @@ export const ProductCard = ({ product }) => {
 
   if (!product) return null;
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e) => {
+    e.preventDefault();
     if (!isAuthenticated) {
       navigate('/login');
       return;
     }
+
+    const card = e.currentTarget.closest('.product-card');
+    const img = card ? card.querySelector('img') : null;
+    const cartIcon = document.querySelector('.nav-btn[title="Cart"]') || document.querySelector('.mobile-nav-item[href="/cart"]');
+
+    if (img && cartIcon) {
+      const rect = img.getBoundingClientRect();
+      const cartRect = cartIcon.getBoundingClientRect();
+      
+      const flyImg = document.createElement('img');
+      flyImg.src = img.src;
+      flyImg.className = 'flying-product';
+      flyImg.style.top = `${rect.top}px`;
+      flyImg.style.left = `${rect.left}px`;
+      flyImg.style.width = `${rect.width}px`;
+      flyImg.style.height = `${rect.height}px`;
+      document.body.appendChild(flyImg);
+      
+      // Trigger animation
+      requestAnimationFrame(() => {
+        flyImg.style.top = `${cartRect.top + (cartRect.height/2) - 10}px`;
+        flyImg.style.left = `${cartRect.left + (cartRect.width/2) - 10}px`;
+        flyImg.style.width = '20px';
+        flyImg.style.height = '20px';
+        flyImg.style.opacity = '1';
+        flyImg.style.transform = 'scale(0.5) rotate(15deg)';
+      });
+      
+      setTimeout(() => {
+        flyImg.remove();
+        const badge = cartIcon.querySelector('.nav-badge-count') || cartIcon.querySelector('.mobile-cart-badge');
+        if (badge) {
+          badge.classList.remove('badge-pop');
+          void badge.offsetWidth;
+          badge.classList.add('badge-pop');
+        }
+      }, 400);
+    }
+
     addToCart(product.id, 1);
   };
 
@@ -123,7 +163,7 @@ export const ProductCard = ({ product }) => {
             </div>
           ) : (
             <div style={{ display: 'flex', gap: '0.5rem', width: '100%' }}>
-              <button type="button" className="btn btn-outline btn-sm" style={{ flex: 1, padding: '0.45rem 0' }} onClick={(e) => { e.preventDefault(); handleAddToCart(); }}>
+              <button type="button" className="btn btn-outline btn-sm" style={{ flex: 1, padding: '0.45rem 0' }} onClick={(e) => handleAddToCart(e)}>
                 Add
               </button>
               <button type="button" className="btn btn-primary btn-glue btn-sm" style={{ flex: 1, padding: '0.45rem 0' }} onClick={handleBuyNow}>

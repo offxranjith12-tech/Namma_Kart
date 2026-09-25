@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { User, Phone, Bike, ShieldCheck, Check, LogOut } from 'lucide-react';
 import { deliveryAPI } from '../../services/api';
-import { DeliveryNav } from '../../components/DeliveryNav';
+import { DeliverySidebar } from '../../components/DeliverySidebar';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
@@ -57,10 +57,10 @@ export const DeliveryProfile = () => {
   };
 
   return (
-    <div>
-      <DeliveryNav />
+    <div className="dashboard-layout">
+      <DeliverySidebar />
 
-      <main className="container" style={{ padding: '2rem 1rem 4rem', maxWidth: '650px' }}>
+      <main className="main-content" style={{ padding: '2rem', maxWidth: '650px' }}>
         <h1 style={{ fontWeight: 800, fontSize: '1.85rem', marginBottom: '1.5rem' }}>Delivery Partner Profile</h1>
 
         {/* Stats card */}
@@ -89,7 +89,7 @@ export const DeliveryProfile = () => {
                 height: '3.5rem',
                 borderRadius: 'var(--radius-full)',
                 backgroundColor: 'var(--color-primary)',
-                color: '#FFFFFF',
+                color: 'var(--color-text-inverse)',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

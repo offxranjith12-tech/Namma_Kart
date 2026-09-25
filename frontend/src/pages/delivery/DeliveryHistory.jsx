@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { History, CheckCircle2, ChevronRight, Calendar } from 'lucide-react';
 import { deliveryAPI } from '../../services/api';
-import { DeliveryNav } from '../../components/DeliveryNav';
+import { DeliverySidebar } from '../../components/DeliverySidebar';
 
 export const DeliveryHistory = () => {
   const [history, setHistory] = useState([]);
@@ -28,10 +28,10 @@ export const DeliveryHistory = () => {
   };
 
   return (
-    <div>
-      <DeliveryNav />
+    <div className="dashboard-layout">
+      <DeliverySidebar />
 
-      <main className="container" style={{ padding: '2rem 1rem 4rem', maxWidth: '850px' }}>
+      <main className="main-content" style={{ padding: '2rem', maxWidth: '850px' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem', flexWrap: 'wrap', gap: '1rem' }}>
           <div>
             <h1 style={{ fontWeight: 800, fontSize: '1.85rem' }}>Delivery History</h1>
