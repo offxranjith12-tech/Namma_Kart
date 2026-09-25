@@ -18,11 +18,18 @@ export const AdminOrders = () => {
   useEffect(() => {
     fetchOrders();
     fetchDeliveryPersons();
+    
+    // Poll for new orders every 10 seconds for live updates
+    const interval = setInterval(() => {
+      fetchOrders(true);
+    }, 10000);
+    
+    return () => clearInterval(interval);
   }, [statusFilter]);
 
-  const fetchOrders = async () => {
+  const fetchOrders = async (silent = false) => {
     try {
-      setLoading(true);
+      if (!silent) setLoading(true);
       const res = await adminAPI.getOrders(statusFilter || null);
       if (res.success) {
         setOrders(res.data);
@@ -30,7 +37,7 @@ export const AdminOrders = () => {
     } catch (err) {
       console.error('Failed to load orders:', err);
     } finally {
-      setLoading(false);
+      if (!silent) setLoading(false);
     }
   };
 

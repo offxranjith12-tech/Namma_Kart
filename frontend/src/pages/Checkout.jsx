@@ -27,9 +27,9 @@ export const Checkout = () => {
   const [showNewAddress, setShowNewAddress] = useState(false);
   const [newAddress, setNewAddress] = useState({
     addressLine: '',
-    city: 'Bengaluru',
-    state: 'Karnataka',
-    pincode: '560103',
+    city: '',
+    state: '',
+    pincode: '',
     isDefault: true,
   });
 
@@ -49,8 +49,35 @@ export const Checkout = () => {
         }
 
         if (slotRes.success) {
-          setDeliverySlots(slotRes.data);
-          if (slotRes.data.length > 0) setSelectedSlotId(slotRes.data[0].id);
+          const now = new Date();
+          const currentHour = now.getHours();
+          const currentMinute = now.getMinutes();
+
+          const validSlots = slotRes.data.filter(slot => {
+            if (!slot.startTime) return true;
+            try {
+              const timeStr = slot.startTime; 
+              const [time, modifier] = timeStr.split(' ');
+              let [hours, minutes] = time.split(':');
+              hours = parseInt(hours, 10);
+              minutes = parseInt(minutes, 10);
+              if (hours === 12 && modifier.toUpperCase() === 'AM') hours = 0;
+              if (modifier.toUpperCase() === 'PM' && hours < 12) hours += 12;
+
+              if (hours > currentHour) return true;
+              if (hours === currentHour && minutes >= currentMinute) return true;
+              return false;
+            } catch (e) {
+              return true; // if parsing fails, just show it
+            }
+          });
+
+          // If it's too late in the day and all slots have passed, we show all slots (assuming they are for tomorrow)
+          // Ideally the backend would provide dates, but we'll use a fallback here.
+          const finalSlots = validSlots.length > 0 ? validSlots : slotRes.data.map(s => ({...s, slotName: s.slotName + ' (Tomorrow)'}));
+          
+          setDeliverySlots(finalSlots);
+          if (finalSlots.length > 0) setSelectedSlotId(finalSlots[0].id);
         }
       } catch (err) {
         console.error('Failed to load checkout details:', err);
@@ -75,13 +102,16 @@ export const Checkout = () => {
         setAddresses((prev) => [...prev, res.data]);
         setSelectedAddressId(res.data.id);
         setShowNewAddress(false);
-        setNewAddress({ addressLine: '', city: 'Bengaluru', state: 'Karnataka', pincode: '560103', isDefault: false });
+        setNewAddress({ addressLine: '', city: '', state: '', pincode: '', isDefault: false });
         showToast('Address added successfully');
       }
     } catch (err) {
       showToast(err.message || 'Failed to save address', 'error');
     }
   };
+
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentStep, setPaymentStep] = useState(1); // 1 = waiting for user, 2 = processing, 3 = success
 
   const handlePlaceOrder = async () => {
     if (!selectedAddressId) {
@@ -93,6 +123,16 @@ export const Checkout = () => {
       return;
     }
 
+    if (paymentMethod !== 'COD') {
+      setShowPaymentModal(true);
+      setPaymentStep(1);
+      return;
+    }
+
+    await executeOrder();
+  };
+
+  const executeOrder = async () => {
     try {
       setPlacingOrder(true);
       const payload = {
@@ -106,14 +146,26 @@ export const Checkout = () => {
       const res = await ordersAPI.create(payload);
       if (res.success) {
         await refreshCart();
+        setShowPaymentModal(false);
         showToast('Order placed successfully! 🎉');
         navigate(`/orders/${res.data.id}`);
       }
     } catch (err) {
       showToast(err.message || 'Failed to place order. Please try again.', 'error');
+      setShowPaymentModal(false);
     } finally {
       setPlacingOrder(false);
     }
+  };
+
+  const simulatePayment = () => {
+    setPaymentStep(2); // processing
+    setTimeout(() => {
+      setPaymentStep(3); // success
+      setTimeout(() => {
+        executeOrder();
+      }, 1000);
+    }, 2500);
   };
 
   if (loading) {
@@ -133,7 +185,7 @@ export const Checkout = () => {
 
       <h1 style={{ fontWeight: 800, fontSize: '1.85rem', marginBottom: '1.75rem' }}>Checkout & Delivery</h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '2rem', alignItems: 'start' }}>
+      <div className="checkout-layout">
         {/* Left Column: Delivery Details & Payment */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.75rem' }}>
           {/* 1. Address Selection */}
@@ -418,6 +470,95 @@ export const Checkout = () => {
           </div>
         </div>
       </div>
+
+      {showPaymentModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000 }}>
+          <div className="card animate-pop-in" style={{ padding: '2.5rem 2rem', width: '90%', maxWidth: '400px', textAlign: 'center', backgroundColor: '#FFFFFF' }}>
+            {paymentStep === 1 && (
+              <>
+                {paymentMethod === 'UPI' ? (
+                  <>
+                    <h3 style={{ fontWeight: 800, fontSize: '1.25rem', marginBottom: '0.5rem' }}>Select UPI App</h3>
+                    <p style={{ color: 'var(--color-text-muted)', marginBottom: '1.5rem', fontSize: '0.9rem' }}>
+                      Amount to pay: <strong style={{ color: 'var(--color-primary)' }}>₹{cart.totalAmount}</strong>
+                    </p>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
+                      <button type="button" className="btn btn-outline" style={{ display: 'flex', flexDirection: 'column', padding: '1rem', gap: '0.5rem' }} onClick={simulatePayment}>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/f/f2/Google_Pay_Logo.svg" alt="GPay" style={{ height: '24px' }} />
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Google Pay</span>
+                      </button>
+                      <button type="button" className="btn btn-outline" style={{ display: 'flex', flexDirection: 'column', padding: '1rem', gap: '0.5rem' }} onClick={simulatePayment}>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/7/71/PhonePe_Logo.svg" alt="PhonePe" style={{ height: '24px' }} />
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>PhonePe</span>
+                      </button>
+                      <button type="button" className="btn btn-outline" style={{ display: 'flex', flexDirection: 'column', padding: '1rem', gap: '0.5rem' }} onClick={simulatePayment}>
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/24/Paytm_Logo_%28standalone%29.svg" alt="Paytm" style={{ height: '24px' }} />
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Paytm</span>
+                      </button>
+                      <button type="button" className="btn btn-outline" style={{ display: 'flex', flexDirection: 'column', padding: '1rem', gap: '0.5rem' }} onClick={simulatePayment}>
+                        <div style={{ fontWeight: 800, fontSize: '1.2rem', color: 'var(--color-primary)' }}>UPI</div>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>Other Apps</span>
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
+                      <CreditCard size={28} color="var(--color-primary)" />
+                      <h3 style={{ fontWeight: 800, fontSize: '1.25rem' }}>Enter Card Details</h3>
+                    </div>
+                    <form onSubmit={(e) => { e.preventDefault(); simulatePayment(); }} style={{ textAlign: 'left', marginBottom: '1rem' }}>
+                      <div className="form-group" style={{ marginBottom: '0.75rem' }}>
+                        <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Card Number</label>
+                        <input type="text" className="form-control" placeholder="0000 0000 0000 0000" maxLength="19" required />
+                      </div>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '0.75rem' }}>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Valid Thru</label>
+                          <input type="text" className="form-control" placeholder="MM/YY" maxLength="5" required />
+                        </div>
+                        <div className="form-group" style={{ marginBottom: 0 }}>
+                          <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>CVV</label>
+                          <input type="password" className="form-control" placeholder="123" maxLength="4" required />
+                        </div>
+                      </div>
+                      <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                        <label style={{ fontSize: '0.8rem', fontWeight: 700 }}>Name on Card</label>
+                        <input type="text" className="form-control" placeholder="e.g. John Doe" required />
+                      </div>
+                      <button type="submit" className="btn btn-primary btn-glue btn-lg" style={{ width: '100%' }}>
+                        Pay Securely ₹{cart.totalAmount}
+                      </button>
+                    </form>
+                  </>
+                )}
+                <button type="button" className="btn btn-soft" style={{ width: '100%', marginTop: '0.75rem' }} onClick={() => setShowPaymentModal(false)}>
+                  Cancel Order
+                </button>
+              </>
+            )}
+            {paymentStep === 2 && (
+              <div style={{ padding: '1rem 0' }}>
+                <div style={{ width: '50px', height: '50px', border: '4px solid var(--color-primary-20)', borderTopColor: 'var(--color-primary)', borderRadius: '50%', margin: '0 auto 1.5rem', animation: 'spin 1s linear infinite' }}></div>
+                <h4 style={{ fontWeight: 800 }}>Processing Payment...</h4>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Please do not hit back or refresh</p>
+              </div>
+            )}
+            {paymentStep === 3 && (
+              <div style={{ padding: '1rem 0' }}>
+                <CheckCircle2 size={60} color="var(--color-primary)" style={{ margin: '0 auto 1.5rem' }} />
+                <h4 style={{ fontWeight: 800 }}>Payment Successful!</h4>
+                <p style={{ color: 'var(--color-text-muted)', fontSize: '0.9rem', marginTop: '0.5rem' }}>Confirming your order...</p>
+              </div>
+            )}
+          </div>
+          <style>{`
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 };

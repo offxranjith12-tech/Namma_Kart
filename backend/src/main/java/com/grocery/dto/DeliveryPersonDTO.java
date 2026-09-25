@@ -19,6 +19,7 @@ public class DeliveryPersonDTO {
     private String phone;
     private String vehicleType;
     private String vehicleNumber;
+    private String licenseNumber;
     private Boolean active;
     private Long assignedOrdersCount;
     private Long completedOrdersCount;

@@ -35,6 +35,9 @@ public class DeliveryPerson {
     @Column(name = "vehicle_number")
     private String vehicleNumber; // e.g. "KA-01-EA-1024"
 
+    @Column(name = "license_number")
+    private String licenseNumber;
+
     @Builder.Default
     @Column(nullable = false)
     private Boolean active = true;

@@ -1,9 +1,10 @@
 import React from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './context/AuthContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { MobileBottomNav } from './components/MobileBottomNav';
+import { ScrollToTop } from './components/ScrollToTop';
 
 // Pages
 import { Home } from './pages/Home';
@@ -30,6 +31,7 @@ import { AdminDeliverySlots } from './pages/admin/AdminDeliverySlots';
 import { AdminCoupons } from './pages/admin/AdminCoupons';
 import { AdminUsers } from './pages/admin/AdminUsers';
 import { AdminAnalytics } from './pages/admin/AdminAnalytics';
+import { AdminReviews } from './pages/admin/AdminReviews';
 
 // Delivery Pages
 import { DeliveryDashboard } from './pages/delivery/DeliveryDashboard';
@@ -57,25 +59,49 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   return children;
 };
 
+// Route Helper to prevent Admins/Delivery from accessing customer store pages
+const PublicCustomerRoute = ({ children }) => {
+  const { user, isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ padding: '4rem', textAlign: 'center' }}>Loading application...</div>;
+  }
+
+  if (isAuthenticated) {
+    if (user?.role === 'ROLE_ADMIN') {
+      return <Navigate to="/admin" replace />;
+    }
+    if (user?.role === 'ROLE_DELIVERY_PERSON') {
+      return <Navigate to="/delivery" replace />;
+    }
+  }
+
+  return children;
+};
+
 export const App = () => {
+  const location = useLocation();
+  const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+
   return (
     <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
-      <Navbar />
+      <ScrollToTop />
+      {!isAuthPage && <Navbar />}
 
       <div style={{ flex: 1 }}>
         <Routes>
           {/* Public & Customer Routes */}
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/products" element={<Products />} />
-          <Route path="/products/:id" element={<ProductDetails />} />
-          <Route path="/cart" element={<Cart />} />
+          <Route path="/" element={<PublicCustomerRoute><Home /></PublicCustomerRoute>} />
+          <Route path="/login" element={<PublicCustomerRoute><Login /></PublicCustomerRoute>} />
+          <Route path="/register" element={<PublicCustomerRoute><Register /></PublicCustomerRoute>} />
+          <Route path="/products" element={<PublicCustomerRoute><Products /></PublicCustomerRoute>} />
+          <Route path="/products/:id" element={<PublicCustomerRoute><ProductDetails /></PublicCustomerRoute>} />
+          <Route path="/cart" element={<PublicCustomerRoute><Cart /></PublicCustomerRoute>} />
           
           <Route
             path="/checkout"
             element={
-              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER', 'ROLE_ADMIN']}>
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
                 <Checkout />
               </ProtectedRoute>
             }
@@ -83,7 +109,7 @@ export const App = () => {
           <Route
             path="/orders"
             element={
-              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER', 'ROLE_ADMIN']}>
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
                 <Orders />
               </ProtectedRoute>
             }
@@ -99,7 +125,7 @@ export const App = () => {
           <Route
             path="/wishlist"
             element={
-              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER', 'ROLE_ADMIN']}>
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
                 <Wishlist />
               </ProtectedRoute>
             }
@@ -107,7 +133,7 @@ export const App = () => {
           <Route
             path="/profile"
             element={
-              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER', 'ROLE_ADMIN']}>
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
                 <Profile />
               </ProtectedRoute>
             }
@@ -115,7 +141,7 @@ export const App = () => {
           <Route
             path="/addresses"
             element={
-              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER', 'ROLE_ADMIN']}>
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
                 <Addresses />
               </ProtectedRoute>
             }
@@ -202,6 +228,14 @@ export const App = () => {
               </ProtectedRoute>
             }
           />
+          <Route
+            path="/admin/reviews"
+            element={
+              <ProtectedRoute allowedRoles={['ROLE_ADMIN']}>
+                <AdminReviews />
+              </ProtectedRoute>
+            }
+          />
 
           {/* Delivery Person Routes */}
           <Route
@@ -250,8 +284,8 @@ export const App = () => {
         </Routes>
       </div>
 
-      <Footer />
-      <MobileBottomNav />
+      {location.pathname === '/' && <Footer />}
+      {!isAuthPage && <MobileBottomNav />}
     </div>
   );
 };

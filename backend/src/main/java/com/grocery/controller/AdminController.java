@@ -21,6 +21,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final CouponService couponService;
     private final DeliverySlotService deliverySlotService;
+    private final ReviewService reviewService;
 
     // Dashboard
     @GetMapping("/dashboard")
@@ -179,5 +180,12 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Void>> deleteDeliverySlot(@PathVariable Long id) {
         deliverySlotService.deleteSlot(id);
         return ResponseEntity.ok(ApiResponse.success("Delivery slot deleted successfully", null));
+    }
+
+    // Reviews Management
+    @GetMapping("/reviews")
+    public ResponseEntity<ApiResponse<List<ReviewDTO>>> getAllReviews() {
+        List<ReviewDTO> reviews = reviewService.getAllReviews();
+        return ResponseEntity.ok(ApiResponse.success(reviews));
     }
 }

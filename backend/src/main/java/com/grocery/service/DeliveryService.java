@@ -128,11 +128,17 @@ public class DeliveryService {
             throw new BadRequestException("Cannot accept order with status " + order.getStatus());
         }
 
+        // Update status to PREPARING
+        if (order.getStatus() == OrderStatus.PLACED || order.getStatus() == OrderStatus.CONFIRMED) {
+            order.setStatus(OrderStatus.PREPARING);
+        }
+
         // Notify customer that delivery agent acknowledged/accepted the pickup
         notificationService.createNotification(order.getUser(), order.getId(),
                 "Your order #NK" + order.getId() + " has been accepted by delivery partner " + dp.getName() + " and is being prepared.");
 
-        return orderService.mapToDTO(order);
+        Order saved = orderRepository.save(order);
+        return orderService.mapToDTO(saved);
     }
 
     @Transactional

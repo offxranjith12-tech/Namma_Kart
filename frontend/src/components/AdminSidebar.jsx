@@ -11,6 +11,7 @@ import {
   Bike,
   BarChart3,
   AlertTriangle,
+  MessageSquare,
 } from 'lucide-react';
 
 export const AdminSidebar = () => {
@@ -83,6 +84,14 @@ export const AdminSidebar = () => {
       >
         <Users size={18} />
         <span>Users</span>
+      </NavLink>
+
+      <NavLink
+        to="/admin/reviews"
+        className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}
+      >
+        <MessageSquare size={18} />
+        <span>Reviews</span>
       </NavLink>
 
       <NavLink

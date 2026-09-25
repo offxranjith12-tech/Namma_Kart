@@ -129,6 +129,9 @@ export const adminAPI = {
   // Users
   getUsers: () => apiClient.get('/admin/users'),
 
+  // Reviews
+  getReviews: () => apiClient.get('/admin/reviews'),
+
   // Coupons
   getCoupons: () => apiClient.get('/admin/coupons'),
   createCoupon: (data) => apiClient.post('/admin/coupons', data),

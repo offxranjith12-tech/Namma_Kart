@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Heart, Plus, Minus, Star, Truck, ShieldCheck, Clock, ArrowLeft } from 'lucide-react';
 import { productsAPI } from '../services/api';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useAuth } from '../context/AuthContext';
 
 export const ProductDetails = () => {
   const { id } = useParams();
@@ -13,6 +14,29 @@ export const ProductDetails = () => {
 
   const { getItemQuantity, addToCart, updateQuantity } = useCart();
   const { isInWishlist, toggleWishlist } = useWishlist();
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
+
+  const handleAddToCart = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    addToCart(product.id, 1);
+  };
+
+  const handleBuyNow = () => {
+    if (!isAuthenticated) {
+      navigate('/login');
+      return;
+    }
+    if (product.stock <= 0) return;
+    
+    if (getItemQuantity(product.id) === 0) {
+      addToCart(product.id, 1);
+    }
+    navigate('/checkout');
+  };
 
   useEffect(() => {
     const fetchProductDetails = async () => {
@@ -59,14 +83,24 @@ export const ProductDetails = () => {
       </Link>
 
       {/* Main Details Grid */}
-      <div style={{ display: 'grid', gridTemplateColumns: 'minmax(300px, 450px) 1fr', gap: '3rem', alignItems: 'start' }}>
+      <div className="product-details-grid">
         {/* Left: Product Image */}
-        <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF' }}>
+        <div className="card" style={{ padding: '2rem', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#FFFFFF', position: 'relative' }}>
           <img
             src={product.imageUrl}
             alt={product.name}
             style={{ maxWidth: '100%', maxHeight: '350px', objectFit: 'contain' }}
           />
+          
+          <button
+            type="button"
+            className={`product-wishlist-btn ${isFav ? 'active' : ''}`}
+            style={{ width: '2.5rem', height: '2.5rem', top: '1rem', right: '1rem' }}
+            onClick={() => toggleWishlist(product.id)}
+            title={isFav ? 'Remove from wishlist' : 'Add to wishlist'}
+          >
+            <Heart size={20} fill={isFav ? 'var(--color-primary)' : 'none'} />
+          </button>
         </div>
 
         {/* Right: Info & Purchase */}
@@ -127,19 +161,19 @@ export const ProductDetails = () => {
               <span className="badge" style={{ padding: '0.4rem 0.8rem' }}>Out of Stock</span>
             ) : (
               <span className="badge badge-soft" style={{ padding: '0.4rem 0.8rem' }}>
-                In Stock ({product.stock} units available)
+                In Stock ({product.stock} {product.unit ? product.unit.replace(/[0-9.\s]+/, '') : 'items'} available)
               </span>
             )}
           </div>
 
           {/* Actions */}
-          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '2rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', flexWrap: 'wrap', marginBottom: '2rem' }}>
             {isOutOfStock ? (
               <button type="button" className="btn btn-soft" disabled style={{ flex: 1 }}>
                 Currently Unavailable
               </button>
             ) : qty > 0 ? (
-              <div className="qty-control" style={{ padding: '0.25rem' }}>
+              <div className="qty-control" style={{ padding: '0.25rem', flex: 1, justifyContent: 'space-between' }}>
                 <button type="button" className="qty-btn" onClick={() => updateQuantity(product.id, qty - 1)}>
                   <Minus size={16} />
                 </button>
@@ -151,9 +185,9 @@ export const ProductDetails = () => {
             ) : (
               <button
                 type="button"
-                className="btn btn-primary btn-lg"
+                className="btn btn-outline btn-lg"
                 style={{ flex: 1 }}
-                onClick={() => addToCart(product.id, 1)}
+                onClick={handleAddToCart}
               >
                 <Plus size={18} /> Add to Cart
               </button>
@@ -161,11 +195,12 @@ export const ProductDetails = () => {
 
             <button
               type="button"
-              className={`btn btn-soft btn-lg ${isFav ? 'btn-primary' : ''}`}
-              onClick={() => toggleWishlist(product.id)}
-              title="Save to Wishlist"
+              className="btn btn-primary btn-glue btn-lg"
+              style={{ flex: 1 }}
+              onClick={handleBuyNow}
+              disabled={isOutOfStock}
             >
-              <Heart size={20} fill={isFav ? '#FFFFFF' : 'none'} />
+              Buy Now
             </button>
           </div>
 

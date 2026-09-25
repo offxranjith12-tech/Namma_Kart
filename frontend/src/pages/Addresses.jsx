@@ -4,16 +4,16 @@ import { MapPin, Plus, Trash2, Edit3, ArrowLeft, CheckCircle2 } from 'lucide-rea
 import { addressesAPI } from '../services/api';
 import { useToast } from '../context/ToastContext';
 
-export const Addresses = () => {
+export const Addresses = ({ embedded = false }) => {
   const [addresses, setAddresses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [formData, setFormData] = useState({
     addressLine: '',
-    city: 'Bengaluru',
-    state: 'Karnataka',
-    pincode: '560103',
+    city: '',
+    state: '',
+    pincode: '',
     isDefault: false,
   });
 
@@ -39,7 +39,7 @@ export const Addresses = () => {
 
   const handleOpenAdd = () => {
     setEditingId(null);
-    setFormData({ addressLine: '', city: 'Bengaluru', state: 'Karnataka', pincode: '560103', isDefault: false });
+    setFormData({ addressLine: '', city: '', state: '', pincode: '', isDefault: false });
     setShowModal(true);
   };
 
@@ -84,13 +84,19 @@ export const Addresses = () => {
   };
 
   return (
-    <div className="container" style={{ padding: '2rem 1rem 4rem', maxWidth: '750px' }}>
-      <Link to="/profile" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem', color: 'var(--color-text-muted)' }}>
-        <ArrowLeft size={16} /> Back to Profile
-      </Link>
+    <div className={!embedded ? "container" : ""} style={!embedded ? { padding: '2rem 1rem 4rem', maxWidth: '750px' } : { marginTop: '2rem' }}>
+      {!embedded && (
+        <Link to="/profile" style={{ display: 'inline-flex', alignItems: 'center', gap: '0.4rem', marginBottom: '1.5rem', color: 'var(--color-text-muted)' }}>
+          <ArrowLeft size={16} /> Back to Profile
+        </Link>
+      )}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.75rem' }}>
-        <h1 style={{ fontWeight: 800, fontSize: '1.85rem' }}>Saved Addresses</h1>
+        {embedded ? (
+          <h3 style={{ fontWeight: 800, fontSize: '1.5rem' }}>Saved Addresses</h3>
+        ) : (
+          <h1 style={{ fontWeight: 800, fontSize: '1.85rem' }}>Saved Addresses</h1>
+        )}
         <button type="button" onClick={handleOpenAdd} className="btn btn-primary btn-sm">
           <Plus size={16} /> Add Address
         </button>

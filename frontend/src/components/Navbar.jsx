@@ -26,20 +26,29 @@ export const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [unreadCount, setUnreadCount] = useState(0);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
 
   useEffect(() => {
     setMobileMenuOpen(false);
+    setMobileSearchOpen(false);
   }, [location.pathname]);
 
   useEffect(() => {
+    let interval;
     if (isAuthenticated) {
-      notificationsAPI.getAll().then((res) => {
-        if (res.success && res.data) {
-          const unread = res.data.filter((n) => !n.isRead).length;
-          setUnreadCount(unread);
-        }
-      }).catch(() => {});
+      const fetchNotifs = () => {
+        notificationsAPI.getAll().then((res) => {
+          if (res.success && res.data) {
+            const unread = res.data.filter((n) => !n.isRead).length;
+            setUnreadCount(unread);
+          }
+        }).catch(() => {});
+      };
+      
+      fetchNotifs();
+      interval = setInterval(fetchNotifs, 10000); // Poll every 10 seconds for live updates
     }
+    return () => clearInterval(interval);
   }, [isAuthenticated, location.pathname]);
 
   const handleSearch = (e) => {
@@ -55,7 +64,7 @@ export const Navbar = () => {
       <header className="navbar">
         <div className="container navbar-inner">
           {/* Brand */}
-          <Link to="/" className="nav-brand">
+          <Link to={isAdmin ? "/admin" : isDeliveryPerson ? "/delivery" : "/"} className="nav-brand">
             <div
               style={{
                 width: '2.4rem',
@@ -113,6 +122,21 @@ export const Navbar = () => {
                 <Link to="/products" className={`nav-btn desktop-only ${location.pathname === '/products' ? 'active' : ''}`}>
                   <span>Explore</span>
                 </Link>
+
+                {/* Mobile Search Icon */}
+                <button
+                  type="button"
+                  className="nav-btn mobile-only"
+                  onClick={() => {
+                    setMobileSearchOpen(!mobileSearchOpen);
+                    if (!mobileSearchOpen) {
+                      setTimeout(() => document.getElementById('mobile-inline-search')?.focus(), 100);
+                    }
+                  }}
+                  title="Search"
+                >
+                  <Search size={18} />
+                </button>
 
                 {isAuthenticated && (
                   <Link to="/wishlist" className="nav-btn desktop-only" title="Wishlist">
@@ -182,6 +206,29 @@ export const Navbar = () => {
             </button>
           </div>
         </div>
+
+        {/* Mobile Inline Search Bar */}
+        {mobileSearchOpen && !isAdmin && !isDeliveryPerson && (
+          <div className="mobile-only" style={{ padding: '0.5rem 1rem 1rem', borderTop: '1px solid var(--color-border)', backgroundColor: '#FFFFFF' }}>
+            <form onSubmit={(e) => {
+              handleSearch(e);
+              setMobileSearchOpen(false);
+            }}>
+              <div style={{ position: 'relative' }}>
+                <input
+                  id="mobile-inline-search"
+                  type="text"
+                  placeholder="Search fresh veggies, milk, fruits..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="form-control"
+                  style={{ paddingLeft: '2.5rem', width: '100%', fontSize: '0.95rem' }}
+                />
+                <Search size={18} style={{ position: 'absolute', left: '0.8rem', top: '50%', transform: 'translateY(-50%)', color: 'var(--color-primary)' }} />
+              </div>
+            </form>
+          </div>
+        )}
       </header>
 
       {/* Responsive Mobile Drawer Menu */}
@@ -210,6 +257,7 @@ export const Navbar = () => {
             <form onSubmit={handleSearch} style={{ marginBottom: '1.5rem' }}>
               <div style={{ position: 'relative' }}>
                 <input
+                  id="mobile-search-input"
                   type="text"
                   placeholder="Search groceries..."
                   value={searchTerm}
@@ -228,7 +276,7 @@ export const Navbar = () => {
                 <span>Explore Catalog</span>
               </Link>
 
-              {isAuthenticated && (
+              {isAuthenticated && user?.role === 'CUSTOMER' && (
                 <>
                   <Link to="/orders" className="sidebar-link">
                     <ShoppingBag size={18} />

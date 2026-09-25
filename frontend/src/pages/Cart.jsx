@@ -79,7 +79,7 @@ export const Cart = () => {
         Shopping Cart ({cart.totalItems} items)
       </h1>
 
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 380px', gap: '2rem', alignItems: 'start' }}>
+      <div className="checkout-layout">
         {/* Left: Cart Items List */}
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
           {cart.items.map((item) => (

@@ -140,10 +140,21 @@ public class OrderService {
                 .totalAmount(totalAmount.setScale(2, RoundingMode.HALF_UP))
                 .paymentMethod(request.getPaymentMethod())
                 .paymentStatus(paymentStatus)
-                .status(OrderStatus.PLACED)
+                .status(OrderStatus.CONFIRMED) // Changed from PLACED
                 .notes(request.getNotes())
                 .items(new ArrayList<>())
                 .build();
+
+        // Auto-assign delivery person for hackathon simulation
+        DeliveryPerson assignedDp = deliveryPersonRepository.findAll().stream()
+                .filter(dp -> Boolean.TRUE.equals(dp.getActive()))
+                .findFirst()
+                .orElse(null);
+                
+        if (assignedDp != null) {
+            order.setDeliveryPerson(assignedDp);
+            order.setAssignedAt(LocalDateTime.now());
+        }
 
         Order savedOrder = orderRepository.save(order);
 
@@ -159,7 +170,20 @@ public class OrderService {
 
         // Create Customer notification
         notificationService.createNotification(user, savedOrder.getId(),
-                "Your order #NK" + savedOrder.getId() + " has been placed successfully!");
+                "Your order #NK" + savedOrder.getId() + " has been placed and confirmed successfully!");
+
+        // Notify Admins
+        final BigDecimal finalTotalAmount = totalAmount;
+        userRepository.findByRole(Role.ROLE_ADMIN).forEach(admin -> 
+            notificationService.createNotification(admin, savedOrder.getId(),
+                "New Order #NK" + savedOrder.getId() + " received from " + user.getName() + " for ₹" + finalTotalAmount)
+        );
+
+        // Notify Delivery Person if assigned
+        if (assignedDp != null) {
+            notificationService.createNotification(assignedDp.getUser(), savedOrder.getId(),
+                "New delivery assigned: Order #NK" + savedOrder.getId() + " to " + address.getCity() + ". Please accept.");
+        }
 
         return mapToDTO(savedOrder);
     }

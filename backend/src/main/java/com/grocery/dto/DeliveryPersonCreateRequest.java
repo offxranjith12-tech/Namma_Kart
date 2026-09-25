@@ -23,5 +23,6 @@ public class DeliveryPersonCreateRequest {
 
     private String vehicleType;
     private String vehicleNumber;
+    private String licenseNumber;
     private Boolean active = true;
 }

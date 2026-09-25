@@ -131,6 +131,7 @@ public class AdminService {
                 .phone(request.getPhone().trim())
                 .vehicleType(request.getVehicleType())
                 .vehicleNumber(request.getVehicleNumber())
+                .licenseNumber(request.getLicenseNumber())
                 .active(request.getActive() != null ? request.getActive() : true)
                 .build();
 
@@ -147,6 +148,7 @@ public class AdminService {
         dp.setPhone(dto.getPhone());
         dp.setVehicleType(dto.getVehicleType());
         dp.setVehicleNumber(dto.getVehicleNumber());
+        dp.setLicenseNumber(dto.getLicenseNumber());
         if (dto.getActive() != null) dp.setActive(dto.getActive());
 
         User user = dp.getUser();
@@ -185,6 +187,7 @@ public class AdminService {
                 .phone(dp.getPhone())
                 .vehicleType(dp.getVehicleType())
                 .vehicleNumber(dp.getVehicleNumber())
+                .licenseNumber(dp.getLicenseNumber())
                 .active(dp.getActive())
                 .assignedOrdersCount(assignedCount)
                 .completedOrdersCount(completedCount)

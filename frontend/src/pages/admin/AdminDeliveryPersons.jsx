@@ -17,6 +17,7 @@ export const AdminDeliveryPersons = () => {
     password: '',
     vehicleType: 'Electric Scooter',
     vehicleNumber: 'KA-04-EV-2026',
+    licenseNumber: '',
     active: true,
   });
 
@@ -49,6 +50,7 @@ export const AdminDeliveryPersons = () => {
       password: '',
       vehicleType: 'Electric Scooter',
       vehicleNumber: 'KA-04-EV-2026',
+      licenseNumber: '',
       active: true,
     });
     setShowModal(true);
@@ -63,6 +65,7 @@ export const AdminDeliveryPersons = () => {
       password: '',
       vehicleType: dp.vehicleType || '',
       vehicleNumber: dp.vehicleNumber || '',
+      licenseNumber: dp.licenseNumber || '',
       active: dp.active,
     });
     setShowModal(true);
@@ -77,6 +80,7 @@ export const AdminDeliveryPersons = () => {
           phone: formData.phone,
           vehicleType: formData.vehicleType,
           vehicleNumber: formData.vehicleNumber,
+          licenseNumber: formData.licenseNumber,
           active: formData.active,
         });
         showToast('Delivery partner profile updated');
@@ -198,6 +202,20 @@ export const AdminDeliveryPersons = () => {
 
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
                   <div className="form-group">
+                    <label className="form-label">License Number</label>
+                    <input
+                      type="text"
+                      className="form-control"
+                      placeholder="e.g. KA-123456"
+                      value={formData.licenseNumber}
+                      onChange={(e) => setFormData({ ...formData, licenseNumber: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem' }}>
+                  <div className="form-group">
                     <label className="form-label">Vehicle Type</label>
                     <input
                       type="text"
@@ -263,7 +281,7 @@ export const AdminDeliveryPersons = () => {
 
                       <td>
                         <strong>{dp.vehicleType || 'Vehicle'}</strong>
-                        <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>{dp.vehicleNumber || 'N/A'}</div>
+                        <div style={{ fontSize: '0.78rem', color: 'var(--color-text-muted)' }}>No: {dp.vehicleNumber || 'N/A'} &bull; Lic: {dp.licenseNumber || 'N/A'}</div>
                       </td>
 
                       <td>

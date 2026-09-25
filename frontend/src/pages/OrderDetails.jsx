@@ -20,11 +20,18 @@ export const OrderDetails = () => {
 
   useEffect(() => {
     fetchOrder();
+
+    // Auto-refresh order status every 10 seconds if not cancelled or delivered
+    const interval = setInterval(() => {
+      fetchOrder(false); // pass silent=false to avoid loading overlay
+    }, 10000);
+
+    return () => clearInterval(interval);
   }, [id]);
 
-  const fetchOrder = async () => {
+  const fetchOrder = async (showLoading = true) => {
     try {
-      setLoading(true);
+      if (showLoading && !order) setLoading(true);
       const res = await ordersAPI.getById(id);
       if (res.success) {
         setOrder(res.data);

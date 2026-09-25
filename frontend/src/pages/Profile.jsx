@@ -4,6 +4,7 @@ import { User, Mail, Phone, MapPin, ShoppingBag, LogOut, Check } from 'lucide-re
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { authAPI } from '../services/api';
+import { Addresses } from './Addresses';
 
 export const Profile = () => {
   const { user, updateUser, logout } = useAuth();
@@ -33,28 +34,21 @@ export const Profile = () => {
     <div className="container" style={{ padding: '2rem 1rem 4rem', maxWidth: '650px' }}>
       <h1 style={{ fontWeight: 800, fontSize: '1.85rem', marginBottom: '1.5rem' }}>My Profile</h1>
 
-      {/* Quick Navigation Cards */}
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-        <Link to="/orders" className="card" style={{ padding: '1.25rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--color-primary-15)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <ShoppingBag size={18} />
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 800, color: 'var(--color-text-main)' }}>My Orders</h4>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>View & track orders</p>
-          </div>
-        </Link>
+      {/* Quick Navigation Cards - Only for Customers */}
+      {user?.role === 'CUSTOMER' && (
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '1rem', marginBottom: '2rem' }}>
+          <Link to="/orders" className="card" style={{ padding: '1.25rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+            <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--color-primary-15)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <ShoppingBag size={18} />
+            </div>
+            <div>
+              <h4 style={{ fontWeight: 800, color: 'var(--color-text-main)' }}>My Orders</h4>
+              <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>View & track orders</p>
+            </div>
+          </Link>
 
-        <Link to="/addresses" className="card" style={{ padding: '1.25rem', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <div style={{ width: '2.5rem', height: '2.5rem', borderRadius: 'var(--radius-full)', backgroundColor: 'var(--color-primary-15)', color: 'var(--color-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <MapPin size={18} />
-          </div>
-          <div>
-            <h4 style={{ fontWeight: 800, color: 'var(--color-text-main)' }}>Saved Addresses</h4>
-            <p style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)' }}>Manage delivery locations</p>
-          </div>
-        </Link>
-      </div>
+        </div>
+      )}
 
       {/* Profile Form */}
       <div className="card" style={{ padding: '2rem' }}>
@@ -126,6 +120,11 @@ export const Profile = () => {
           </div>
         </form>
       </div>
+
+      {/* Embedded Addresses Section */}
+      {user?.role === 'CUSTOMER' && (
+        <Addresses embedded={true} />
+      )}
     </div>
   );
 };

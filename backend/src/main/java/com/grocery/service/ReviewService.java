@@ -81,6 +81,13 @@ public class ReviewService {
                 .collect(Collectors.toList());
     }
 
+    public List<ReviewDTO> getAllReviews() {
+        return reviewRepository.findAll().stream()
+                .sorted((a, b) -> b.getCreatedAt().compareTo(a.getCreatedAt()))
+                .map(this::mapToDTO)
+                .collect(Collectors.toList());
+    }
+
     private ReviewDTO mapToDTO(Review review) {
         return ReviewDTO.builder()
                 .id(review.getId())
