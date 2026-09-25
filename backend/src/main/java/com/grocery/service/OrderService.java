@@ -197,6 +197,51 @@ public class OrderService {
                 .collect(Collectors.toList());
     }
 
+    public List<ProductDTO> getBuyAgain(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
+        
+        java.util.Set<Long> productIds = new java.util.LinkedHashSet<>();
+        for (Order order : orders) {
+            for (OrderItem item : order.getItems()) {
+                if (item.getProduct() != null && Boolean.TRUE.equals(item.getProduct().getActive())) {
+                    productIds.add(item.getProduct().getId());
+                }
+            }
+            if (productIds.size() >= 10) break; // Limit to 10 recently bought products
+        }
+
+        return productIds.stream()
+                .map(id -> productRepository.findById(id).orElse(null))
+                .filter(p -> p != null)
+                .map(p -> {
+                    BigDecimal discountedPrice = p.getPrice();
+                    if (p.getDiscount() != null && p.getDiscount().compareTo(BigDecimal.ZERO) > 0) {
+                        BigDecimal multiplier = BigDecimal.ONE.subtract(p.getDiscount().divide(BigDecimal.valueOf(100), 4, RoundingMode.HALF_UP));
+                        discountedPrice = p.getPrice().multiply(multiplier).setScale(2, RoundingMode.HALF_UP);
+                    }
+                    return ProductDTO.builder()
+                            .id(p.getId())
+                            .categoryId(p.getCategory() != null ? p.getCategory().getId() : null)
+                            .categoryName(p.getCategory() != null ? p.getCategory().getName() : "")
+                            .name(p.getName())
+                            .description(p.getDescription())
+                            .price(p.getPrice())
+                            .stock(p.getStock())
+                            .unit(p.getUnit())
+                            .imageUrl(p.getImageUrl())
+                            .discount(p.getDiscount())
+                            .discountedPrice(discountedPrice)
+                            .active(p.getActive())
+                            .minQuantity(p.getMinQuantity())
+                            .maxQuantity(p.getMaxQuantity())
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
     public OrderResponseDTO getOrderById(Long userId, Long orderId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
@@ -385,6 +430,127 @@ public class OrderService {
                 .createdAt(order.getCreatedAt())
                 .updatedAt(order.getUpdatedAt())
                 .items(itemDTOs)
+                .build();
+    }
+
+    public ShoppingAnalyticsDTO getShoppingAnalytics(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+        List<Order> orders = orderRepository.findByUserOrderByCreatedAtDesc(user);
+        
+        Double totalSpent = 0.0;
+        Double totalSaved = 0.0;
+        Double currentMonthSpent = 0.0;
+        Double previousMonthSpent = 0.0;
+        
+        LocalDateTime now = LocalDateTime.now();
+        int currentMonth = now.getMonthValue();
+        int currentYear = now.getYear();
+        
+        LocalDateTime previousMonthDate = now.minusMonths(1);
+        int prevMonth = previousMonthDate.getMonthValue();
+        int prevYear = previousMonthDate.getYear();
+
+        java.util.Map<String, Integer> productQuantities = new java.util.HashMap<>();
+        java.util.Map<String, Double> productSpent = new java.util.HashMap<>();
+        java.util.Map<String, Double> categorySpent = new java.util.HashMap<>();
+        java.util.Map<String, Double> monthlySpentMap = new java.util.LinkedHashMap<>();
+        java.util.Map<String, Double> recentSpentMap = new java.util.LinkedHashMap<>();
+
+        // Initialize last 6 months
+        for (int i = 5; i >= 0; i--) {
+            LocalDateTime m = now.minusMonths(i);
+            String monthStr = m.getMonth().name().substring(0, 3) + " " + m.getYear();
+            monthlySpentMap.put(monthStr, 0.0);
+        }
+
+        for (Order order : orders) {
+            double orderTotal = order.getTotalAmount() != null ? order.getTotalAmount().doubleValue() : 0.0;
+            double orderDiscount = order.getDiscount() != null ? order.getDiscount().doubleValue() : 0.0;
+            double couponDiscount = order.getCouponDiscount() != null ? order.getCouponDiscount().doubleValue() : 0.0;
+            
+            totalSpent += orderTotal;
+            totalSaved += (orderDiscount + couponDiscount);
+            
+            LocalDateTime orderDate = order.getCreatedAt();
+            
+            if (orderDate.getMonthValue() == currentMonth && orderDate.getYear() == currentYear) {
+                currentMonthSpent += orderTotal;
+            } else if (orderDate.getMonthValue() == prevMonth && orderDate.getYear() == prevYear) {
+                previousMonthSpent += orderTotal;
+            }
+
+            String monthStr = orderDate.getMonth().name().substring(0, 3) + " " + orderDate.getYear();
+            if (monthlySpentMap.containsKey(monthStr)) {
+                monthlySpentMap.put(monthStr, monthlySpentMap.get(monthStr) + orderTotal);
+            }
+
+            String dateStr = orderDate.toLocalDate().toString();
+            recentSpentMap.put(dateStr, recentSpentMap.getOrDefault(dateStr, 0.0) + orderTotal);
+
+            for (OrderItem item : order.getItems()) {
+                String pName = item.getProductName();
+                Double itemSub = item.getSubtotal() != null ? item.getSubtotal().doubleValue() : 0.0;
+                
+                productQuantities.put(pName, productQuantities.getOrDefault(pName, 0) + item.getQuantity());
+                productSpent.put(pName, productSpent.getOrDefault(pName, 0.0) + itemSub);
+                
+                if (item.getProduct() != null && item.getProduct().getCategory() != null) {
+                    String cName = item.getProduct().getCategory().getName();
+                    categorySpent.put(cName, categorySpent.getOrDefault(cName, 0.0) + itemSub);
+                }
+            }
+        }
+
+        Double avgOrderValue = orders.isEmpty() ? 0.0 : totalSpent / orders.size();
+
+        List<ShoppingAnalyticsDTO.ProductSummary> topProducts = productQuantities.entrySet().stream()
+                .map(e -> ShoppingAnalyticsDTO.ProductSummary.builder()
+                        .productName(e.getKey())
+                        .quantity(e.getValue())
+                        .totalSpent(productSpent.get(e.getKey()))
+                        .build())
+                .sorted((a, b) -> b.getQuantity().compareTo(a.getQuantity()))
+                .limit(5)
+                .collect(Collectors.toList());
+
+        List<ShoppingAnalyticsDTO.CategorySummary> topCategories = categorySpent.entrySet().stream()
+                .map(e -> ShoppingAnalyticsDTO.CategorySummary.builder()
+                        .categoryName(e.getKey())
+                        .totalSpent(e.getValue())
+                        .build())
+                .sorted((a, b) -> b.getTotalSpent().compareTo(a.getTotalSpent()))
+                .limit(5)
+                .collect(Collectors.toList());
+
+        List<ShoppingAnalyticsDTO.MonthlySpending> monthlySpendingList = monthlySpentMap.entrySet().stream()
+                .map(e -> ShoppingAnalyticsDTO.MonthlySpending.builder()
+                        .month(e.getKey())
+                        .amount(e.getValue())
+                        .build())
+                .collect(Collectors.toList());
+                
+        List<ShoppingAnalyticsDTO.RecentSpending> recentSpendingList = recentSpentMap.entrySet().stream()
+                .map(e -> ShoppingAnalyticsDTO.RecentSpending.builder()
+                        .date(e.getKey())
+                        .amount(e.getValue())
+                        .build())
+                .sorted((a, b) -> b.getDate().compareTo(a.getDate()))
+                .limit(7)
+                .collect(Collectors.toList());
+
+        return ShoppingAnalyticsDTO.builder()
+                .totalSpent(Math.round(totalSpent * 100.0) / 100.0)
+                .totalOrders(orders.size())
+                .averageOrderValue(Math.round(avgOrderValue * 100.0) / 100.0)
+                .currentMonthSpent(Math.round(currentMonthSpent * 100.0) / 100.0)
+                .previousMonthSpent(Math.round(previousMonthSpent * 100.0) / 100.0)
+                .totalSaved(Math.round(totalSaved * 100.0) / 100.0)
+                .mostPurchasedProducts(topProducts)
+                .mostPurchasedCategories(topCategories)
+                .monthlySpending(monthlySpendingList)
+                .recentSpending(recentSpendingList)
                 .build();
     }
 }

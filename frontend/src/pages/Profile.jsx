@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { User, Mail, Phone, MapPin, ShoppingBag, LogOut, Check } from 'lucide-react';
+import { User, Mail, Phone, MapPin, ShoppingBag, LogOut, Check, List, TrendingUp } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { authAPI } from '../services/api';
@@ -121,8 +121,32 @@ export const Profile = () => {
         </form>
       </div>
 
+      {user?.role === 'ROLE_CUSTOMER' && (
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+          <Link to="/grocery-lists" className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ padding: '1rem', backgroundColor: 'rgba(46, 204, 113, 0.1)', borderRadius: '12px', color: 'var(--color-primary)' }}>
+              <List size={24} />
+            </div>
+            <div>
+              <h3 style={{ margin: 0 }}>My Grocery Lists</h3>
+              <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>Manage your saved lists</p>
+            </div>
+          </Link>
+          
+          <Link to="/profile/analytics" className="card" style={{ padding: '1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', textDecoration: 'none', color: 'inherit' }}>
+            <div style={{ padding: '1rem', backgroundColor: 'rgba(46, 204, 113, 0.1)', borderRadius: '12px', color: 'var(--color-primary)' }}>
+              <TrendingUp size={24} />
+            </div>
+            <div>
+              <h3 style={{ margin: 0 }}>Shopping Analytics</h3>
+              <p style={{ margin: '0.25rem 0 0', fontSize: '0.85rem', color: 'var(--color-text-muted)' }}>View your spending insights</p>
+            </div>
+          </Link>
+        </div>
+      )}
+
       {/* Embedded Addresses Section */}
-      {user?.role === 'CUSTOMER' && (
+      {user?.role === 'ROLE_CUSTOMER' && (
         <Addresses embedded={true} />
       )}
     </div>

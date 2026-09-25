@@ -20,6 +20,8 @@ import { Wishlist } from './pages/Wishlist';
 import { Profile } from './pages/Profile';
 import { Addresses } from './pages/Addresses';
 import { Notifications } from './pages/Notifications';
+import { GroceryLists } from './pages/GroceryLists';
+import { ShoppingAnalytics } from './pages/ShoppingAnalytics';
 
 // Admin Pages
 import { AdminDashboard } from './pages/admin/AdminDashboard';
@@ -141,6 +143,22 @@ export const App = () => {
             element={
               <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
                 <Addresses />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/grocery-lists"
+            element={
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
+                <GroceryLists />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/profile/analytics"
+            element={
+              <ProtectedRoute allowedRoles={['ROLE_CUSTOMER']}>
+                <ShoppingAnalytics />
               </ProtectedRoute>
             }
           />

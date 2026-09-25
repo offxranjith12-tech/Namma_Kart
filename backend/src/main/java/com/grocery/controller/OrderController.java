@@ -50,4 +50,18 @@ public class OrderController {
         OrderResponseDTO order = orderService.cancelOrder(principal.getId(), id);
         return ResponseEntity.ok(ApiResponse.success("Order cancelled successfully", order));
     }
+
+    @GetMapping("/analytics")
+    public ResponseEntity<ApiResponse<com.grocery.dto.ShoppingAnalyticsDTO>> getShoppingAnalytics(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        com.grocery.dto.ShoppingAnalyticsDTO analytics = orderService.getShoppingAnalytics(principal.getId());
+        return ResponseEntity.ok(ApiResponse.success(analytics));
+    }
+
+    @GetMapping("/buy-again")
+    public ResponseEntity<ApiResponse<List<com.grocery.dto.ProductDTO>>> getBuyAgain(
+            @AuthenticationPrincipal UserPrincipal principal) {
+        List<com.grocery.dto.ProductDTO> products = orderService.getBuyAgain(principal.getId());
+        return ResponseEntity.ok(ApiResponse.success(products));
+    }
 }

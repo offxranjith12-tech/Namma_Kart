@@ -98,6 +98,16 @@ export const ordersAPI = {
   getUserOrders: () => apiClient.get('/orders'),
   getById: (id) => apiClient.get(`/orders/${id}`),
   cancel: (id) => apiClient.put(`/orders/${id}/cancel`),
+  getBuyAgain: () => apiClient.get('/orders/buy-again'),
+  getAnalytics: () => apiClient.get('/orders/analytics'),
+};
+
+export const groceryListAPI = {
+  getAll: () => apiClient.get('/grocery-lists'),
+  create: (data) => apiClient.post('/grocery-lists', data),
+  addOrUpdateItem: (listId, data) => apiClient.post(`/grocery-lists/${listId}/items`, data),
+  removeItem: (listId, productId) => apiClient.delete(`/grocery-lists/${listId}/items/${productId}`),
+  delete: (listId) => apiClient.delete(`/grocery-lists/${listId}`),
 };
 
 export const notificationsAPI = {
