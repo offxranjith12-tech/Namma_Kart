@@ -179,10 +179,11 @@ public class SecurityConfig {
         CorsConfiguration configuration =
             new CorsConfiguration();
 
-        // Your deployed React frontend
+        // Your deployed React frontend and local development
         configuration.setAllowedOriginPatterns(
             List.of(
-                "https://namma-kart-frontend.onrender.com"
+                "https://namma-kart-frontend.onrender.com",
+                "http://localhost:5173"
             )
         );
 

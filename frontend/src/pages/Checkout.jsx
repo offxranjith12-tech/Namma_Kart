@@ -22,7 +22,7 @@ export const Checkout = () => {
   const [couponCode, setCouponCode] = useState(initialCoupon);
   const [loading, setLoading] = useState(true);
   const [placingOrder, setPlacingOrder] = useState(false);
-  const [deliveryType, setDeliveryType] = useState('STANDARD');
+  const [deliveryType, setDeliveryType] = useState('SCHEDULED');
 
   // New Address Form toggle
   const [showNewAddress, setShowNewAddress] = useState(false);
@@ -45,8 +45,6 @@ export const Checkout = () => {
 
         if (addrRes.success) {
           setAddresses(addrRes.data);
-          const defaultAddr = addrRes.data.find((a) => a.isDefault) || addrRes.data[0];
-          if (defaultAddr) setSelectedAddressId(defaultAddr.id);
         }
 
         if (slotRes.success) {
@@ -292,8 +290,6 @@ export const Checkout = () => {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '0.75rem' }}>
               {[
-                { type: 'STANDARD', label: 'Standard Delivery', desc: cart.totalAmount >= 500 ? 'FREE' : '₹30 Charge' },
-                { type: 'EXPRESS', label: 'Express Delivery ⚡', desc: '₹50 Charge (Under 30 mins)' },
                 { type: 'SCHEDULED', label: 'Scheduled Delivery 🕐', desc: 'Choose a time slot below' },
               ].map((opt) => (
                 <div
@@ -502,7 +498,7 @@ export const Checkout = () => {
               <hr style={{ borderColor: 'var(--color-border)', margin: '0.5rem 0' }} />
               <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.2rem', fontWeight: 900 }}>
                 <span>Total Amount</span>
-                <span style={{ color: 'var(--color-primary)' }}>₹{deliveryType === 'EXPRESS' ? cart.totalAmount + 50 : cart.totalAmount}</span>
+                <span style={{ color: 'var(--color-primary)' }}>₹{cart.totalAmount}</span>
               </div>
             </div>
 

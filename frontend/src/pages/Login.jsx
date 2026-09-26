@@ -42,11 +42,6 @@ export const Login = () => {
     }
   };
 
-  const handleQuickLogin = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-  };
-
   return (
     <div className="container" style={{ minHeight: '80vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem 1rem' }}>
       <div className="card" style={{ width: '100%', maxWidth: '440px', padding: '2.25rem' }}>
@@ -117,43 +112,6 @@ export const Login = () => {
           </button>
         </form>
 
-        {/* Demo Credentials Box */}
-        <div style={{ marginTop: '2rem', paddingTop: '1.5rem', borderTop: '1px solid var(--color-border)' }}>
-          <p style={{ fontSize: '0.82rem', fontWeight: 700, color: 'var(--color-text-subtle)', marginBottom: '0.75rem', textTransform: 'uppercase', textAlign: 'center' }}>
-            Quick Demo Login (1-Click Fill)
-          </p>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-            <button
-              type="button"
-              className="btn btn-soft btn-sm"
-              style={{ justifyContent: 'flex-start', fontSize: '0.82rem' }}
-              onClick={() => handleQuickLogin('customer@grocery.com', 'Customer@123')}
-            >
-              <User size={15} color="var(--color-primary)" />
-              <span><strong>Customer:</strong> customer@grocery.com</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-soft btn-sm"
-              style={{ justifyContent: 'flex-start', fontSize: '0.82rem' }}
-              onClick={() => handleQuickLogin('delivery@grocery.com', 'Delivery@123')}
-            >
-              <Truck size={15} color="var(--color-primary)" />
-              <span><strong>Delivery Person:</strong> delivery@grocery.com</span>
-            </button>
-
-            <button
-              type="button"
-              className="btn btn-soft btn-sm"
-              style={{ justifyContent: 'flex-start', fontSize: '0.82rem' }}
-              onClick={() => handleQuickLogin('admin@grocery.com', 'Admin@123')}
-            >
-              <ShieldCheck size={15} color="var(--color-primary)" />
-              <span><strong>Admin:</strong> admin@grocery.com</span>
-            </button>
-          </div>
-        </div>
 
         {/* Register Link */}
         <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.9rem', color: 'var(--color-text-muted)' }}>
