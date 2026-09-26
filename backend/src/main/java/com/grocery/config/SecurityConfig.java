@@ -34,69 +34,202 @@ public class SecurityConfig {
     private final JwtAuthenticationEntryPoint unauthorizedHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
+    // Password Encoder
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // Authentication Manager
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
+    public AuthenticationManager authenticationManager(
+            AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
+    // Security Configuration
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
+            // CORS
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
+
+            // Disable CSRF because this is a REST API using JWT
             .csrf(AbstractHttpConfigurer::disable)
-            .headers(headers -> headers.frameOptions(HeadersConfigurer.FrameOptionsConfig::disable)) // For H2 console if needed
-            .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
-            .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+            // H2 console support if needed
+            .headers(headers ->
+                headers.frameOptions(
+                    HeadersConfigurer.FrameOptionsConfig::disable
+                )
+            )
+
+            // Unauthorized request handler
+            .exceptionHandling(exception ->
+                exception.authenticationEntryPoint(unauthorizedHandler)
+            )
+
+            // JWT = Stateless
+            .sessionManagement(session ->
+                session.sessionCreationPolicy(
+                    SessionCreationPolicy.STATELESS
+                )
+            )
+
+            // Authorization rules
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints
+
+                // =========================
+                // PUBLIC ENDPOINTS
+                // =========================
                 .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/delivery-slots/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products/*/reviews").permitAll()
+
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/categories/**"
+                ).permitAll()
+
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/products/**"
+                ).permitAll()
+
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/delivery-slots/**"
+                ).permitAll()
+
+                .requestMatchers(
+                    HttpMethod.GET,
+                    "/api/products/*/reviews"
+                ).permitAll()
+
                 .requestMatchers("/h2-console/**").permitAll()
 
-                // Admin endpoints
-                .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // Delivery Person endpoints
-                .requestMatchers("/api/delivery/**").hasRole("DELIVERY_PERSON")
+                // =========================
+                // ADMIN ENDPOINTS
+                // =========================
+                .requestMatchers("/api/admin/**")
+                .hasRole("ADMIN")
 
-                // Common / Customer authenticated endpoints
-                .requestMatchers("/api/users/me").authenticated()
-                .requestMatchers("/api/addresses/**").authenticated()
-                .requestMatchers("/api/cart/**").authenticated()
-                .requestMatchers("/api/wishlist/**").authenticated()
-                .requestMatchers("/api/coupons/validate").authenticated()
-                .requestMatchers("/api/orders/**").authenticated()
-                .requestMatchers("/api/notifications/**").authenticated()
-                .requestMatchers(HttpMethod.POST, "/api/products/*/reviews").authenticated()
 
-                .anyRequest().authenticated()
+                // =========================
+                // DELIVERY PERSON
+                // =========================
+                .requestMatchers("/api/delivery/**")
+                .hasRole("DELIVERY_PERSON")
+
+
+                // =========================
+                // AUTHENTICATED USER
+                // =========================
+                .requestMatchers("/api/users/me")
+                .authenticated()
+
+                .requestMatchers("/api/addresses/**")
+                .authenticated()
+
+                .requestMatchers("/api/cart/**")
+                .authenticated()
+
+                .requestMatchers("/api/wishlist/**")
+                .authenticated()
+
+                .requestMatchers("/api/coupons/validate")
+                .authenticated()
+
+                .requestMatchers("/api/orders/**")
+                .authenticated()
+
+                .requestMatchers("/api/notifications/**")
+                .authenticated()
+
+                .requestMatchers(
+                    HttpMethod.POST,
+                    "/api/products/*/reviews"
+                ).authenticated()
+
+
+                // =========================
+                // EVERYTHING ELSE
+                // =========================
+                .anyRequest()
+                .authenticated()
             );
 
-        http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+        // JWT Authentication Filter
+        http.addFilterBefore(
+            jwtAuthenticationFilter,
+            UsernamePasswordAuthenticationFilter.class
+        );
 
         return http.build();
     }
 
+
+    // =========================================================
+    // CORS CONFIGURATION
+    // =========================================================
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOriginPatterns(List.of("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin", "Access-Control-Request-Method", "Access-Control-Request-Headers"));
-        configuration.setExposedHeaders(List.of("Authorization"));
+
+        CorsConfiguration configuration =
+            new CorsConfiguration();
+
+        // Your deployed React frontend
+        configuration.setAllowedOriginPatterns(
+            List.of(
+                "https://namma-kart-frontend.onrender.com"
+            )
+        );
+
+        // Allowed HTTP methods
+        configuration.setAllowedMethods(
+            Arrays.asList(
+                "GET",
+                "POST",
+                "PUT",
+                "PATCH",
+                "DELETE",
+                "OPTIONS"
+            )
+        );
+
+        // Allowed request headers
+        configuration.setAllowedHeaders(
+            Arrays.asList(
+                "Authorization",
+                "Content-Type",
+                "X-Requested-With",
+                "Accept",
+                "Origin",
+                "Access-Control-Request-Method",
+                "Access-Control-Request-Headers"
+            )
+        );
+
+        // Headers exposed to frontend
+        configuration.setExposedHeaders(
+            List.of("Authorization")
+        );
+
+        // Required for JWT / credentials
         configuration.setAllowCredentials(true);
+
+        // Browser can cache CORS preflight response
         configuration.setMaxAge(3600L);
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
+        UrlBasedCorsConfigurationSource source =
+            new UrlBasedCorsConfigurationSource();
+
+        source.registerCorsConfiguration(
+            "/**",
+            configuration
+        );
+
         return source;
     }
 }
